@@ -30,6 +30,10 @@ module.exports = {
       }
     ]
   },
+  output: {
+    path: __dirname + '/dist',
+    filename: 'dist/main.js'
+  },
   plugins: [
     new HtmlWebPackPlugin({
       template: "./src/index.html",
