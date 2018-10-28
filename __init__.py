@@ -1,11 +1,17 @@
 import os
 
-from flask import Flask
+from flask import Flask, render_template, url_for
 
 
 def create_app(test_config=None):
     # create and configure the app
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(
+        __name__,
+        instance_relative_config=True,
+        static_folder='dist',
+        template_folder='dist',
+    )
+
     app.config.from_mapping(
         SECRET_KEY='dev',
         DATABASE=os.path.join(app.instance_path, 'flaskr.sqlite'),
@@ -24,9 +30,8 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
+    @app.route('/')
+    def root():
+        return render_template('index.html')
 
     return app
