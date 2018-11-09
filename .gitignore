@@ -1,3 +1,4 @@
+.idea/
 package-lock.json
 
 # Logs
@@ -90,6 +91,7 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+a/
 downloads/
 eggs/
 .eggs/
