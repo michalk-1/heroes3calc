@@ -31,8 +31,8 @@ module.exports = {
     ]
   },
   output: {
-    path: __dirname + '/dist',
-    filename: 'dist/main.js'
+    path: __dirname + '/a',
+    filename: 'main.js'
   },
   plugins: [
     new HtmlWebPackPlugin({

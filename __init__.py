@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, redirect
 
 
 def create_app(test_config=None):
@@ -8,8 +8,8 @@ def create_app(test_config=None):
     app = Flask(
         __name__,
         instance_relative_config=True,
-        static_folder='dist',
-        template_folder='dist',
+        static_folder='a',
+        template_folder='a',
     )
 
     app.config.from_mapping(
@@ -30,8 +30,12 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    @app.route('/a/h3calc')
+    def h3calc():
+        return render_template('index.html')
+
     @app.route('/')
     def root():
-        return render_template('index.html')
+        return redirect(url_for('h3calc'), code=302)
 
     return app
