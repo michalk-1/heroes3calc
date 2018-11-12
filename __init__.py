@@ -1,6 +1,8 @@
 import os
 
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, request, jsonify
+
+from .via import csv as via_csv
 
 
 def create_app(test_config=None):
@@ -37,5 +39,12 @@ def create_app(test_config=None):
     @app.route('/')
     def root():
         return redirect(url_for('h3calc'), code=302)
+
+    allowed_queries = ('town', 'name')
+
+    @app.route('/d/list_of_creatures')
+    def list_of_creatures():
+        query = {key: value for key, value in request.args.items() if key in allowed_queries}
+        return jsonify(via_csv.list_of_creatures(**query))
 
     return app
