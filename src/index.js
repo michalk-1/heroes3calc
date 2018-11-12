@@ -68,6 +68,12 @@ class Calc extends React.Component {
     });
   }
 
+  getByTown(town) {
+    const creature_names = ['marksman', 'griffin', 'angel'];
+    const creatures = creature_names.map(name => <Creature key={name} name={name} onClick={this.handleCreatureClick}/>);
+    return <div>{creatures}</div>
+  }
+
   render() {
     return (
       <div className={style.calc}>
@@ -110,10 +116,7 @@ class Calc extends React.Component {
         </div>
         <div className={style.creatures}>
           Castle<br/>
-          <Creature name="marksman" onClick={this.handleCreatureClick}/>
-          <Creature name="griffin" onClick={this.handleCreatureClick}/>
-          <Creature name="royal_griffin" onClick={this.handleCreatureClick}/>
-          <Creature name="angel" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Castle')}
           <br/>Rampart<br/>
           <Creature name="grand_elf" onClick={this.handleCreatureClick}/>
           <Creature name="unicorn" onClick={this.handleCreatureClick}/>
