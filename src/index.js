@@ -4,55 +4,9 @@ import style from './index.css';
 import { STATS, TITLES, NAMES } from './data.js';
 import { getCookie, setCookie } from './cookie-lib.js';
 import { toggleClass, calcMin, calcMax, totalHealth } from './calc-lib.js';
-
-class CalcResult extends React.Component {
-  render() {
-    return (
-      <div>
-        <p>
-          Damage:{' '}
-          <span>{this.props.min}</span>
-          {' '}-{' '}
-          <span>{this.props.max}</span>
-          {' '}(<span>{0.5 * (this.props.min + this.props.max)}</span>)
-        </p>
-        <p>
-          Hitpoints:{' '}
-          <span>{this.props.totalHealth}</span>
-        </p>
-      </div>
-    );
-  }
-}
-
-class CalcInput extends React.Component {
-  render() {
-    return (
-      <input onChange={this.props.onChange} value={this.props.value} />
-    );
-  }
-}
-
-class Creature extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-    this.src = "creatures_small/" + this.props.name + ".gif";
-  }
-
-  handleClick(ev) {
-    this.props.onClick(this.props.name);
-  }
-
-  render() {
-    return (
-      <div className={style.creature}>
-        <img src={this.src} alt={this.props.name} onClick={this.handleClick}/>
-      </div>
-    );
-  }
-}
-
+import { CalcResult } from './components/CalcResult/index.js';
+import { CalcInput } from './components/CalcInput/index.js';
+import { Creature } from './components/Creature/index.js';
 
 class Calc extends React.Component {
   constructor(props) {

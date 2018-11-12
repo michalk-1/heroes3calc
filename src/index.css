@@ -26,10 +26,6 @@
   grid-row: 1;
 }
 
-.creature {
-  display: inline;
-}
-
 .creature-banks {
   grid-column-start: 1;
   grid-column-end: 3;
