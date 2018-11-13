@@ -18,9 +18,7 @@ export function getCookie(name) {
     return null;
   }
 
-  console.log(regex_match[1]);
   let result = regex_match[1].replace('&#59#&', ';');
-  console.log(result);
   result = JSON.parse(result);
   return result;
 }

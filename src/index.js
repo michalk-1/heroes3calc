@@ -14,15 +14,11 @@ class Calc extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleCreatureClick = this.handleCreatureClick.bind(this);
     this.resetToggle = this.resetToggle.bind(this);
+    let initial  = Object.assign(...NUMBER_NAMES.map(x => ({[x]: 0})));
+    initial.amount = 1;
     this.state = {
-      attacking: {
-        additional_attack: 0,
-        amount: 1,
-      },
-      defending: {
-        additional_defense: 0,
-        amount: 1,
-      }
+      attacking: initial,
+      defending: Object.assign({}, initial),
     }
     const attacking = getCookie('attacking');
     const defending = getCookie('defending');
