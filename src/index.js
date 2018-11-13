@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import style from './index.css';
-import { STATS, TITLES, NAMES } from './data.js';
+import { NUMBER_NAMES, TOWNS, TITLES, NAMES } from './data.js';
 import { getCookie, setCookie } from './cookie-lib.js';
 import { toggleClass, calcMin, calcMax, totalHealth } from './calc-lib.js';
 import { CalcResult } from './components/CalcResult/index.js';
@@ -14,23 +14,39 @@ class Calc extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleCreatureClick = this.handleCreatureClick.bind(this);
     this.resetToggle = this.resetToggle.bind(this);
+    this.getByTown = this.getByTown.bind(this);
     this.state = {
       attacking: {
-        additional_attack: 1,
-        amount: 10,
+        additional_attack: 0,
+        amount: 1,
       },
       defending: {
         additional_defense: 0,
-        amount: 10,
+        amount: 1,
       }
     }
     const attacking = getCookie('attacking');
     const defending = getCookie('defending');
-    this.state.attacking = Object.assign({}, this.state.attacking, STATS.wolf_raider, attacking);
-    this.state.defending = Object.assign({}, this.state.defending, STATS.wolf_raider, defending);
+    this.state.attacking = Object.assign({}, this.state.attacking, attacking);
+    this.state.defending = Object.assign({}, this.state.defending, defending);
     this.state.toggle = 'attacking';
+    this.creatures_by_town = {};
+    let calc = this;
+    TOWNS.forEach(function(town){
+      const uri = "http://localhost:5000/d/list_of_creatures?town=" + town;
+      fetch(uri)
+        .then(res => res.json())
+        .then(
+          (result) => {
+            calc.creatures_by_town[town] = result['uri'];
+            calc.forceUpdate();
+          },
+          (error) => {
+            console.log(error);
+          }
+        )
+    });
 
-    setInterval(this.resetToggle, 5000);
   }
 
   resetToggle() {
@@ -47,20 +63,43 @@ class Calc extends React.Component {
         <CalcInput value={this.state[className][name]}
                    className={className}
                    name={name}
-                   onChange={(ev) => this.handleInputChange(className, name, ev.target.value)}/>
+                   onChange={(ev) =>
+                    this.handleInputChange(className, name, ev.target.value)}/>
       </div>
     );
   }
 
   handleInputChange(className, name, value) {
-    var state_class = this.state[className];
-    state_class[name] = name === 'name' ? value : Number(value);
+    let state_class = this.state[className];
+    const is_number = NUMBER_NAMES.indexOf(name) !== -1;
+    state_class[name] = is_number ? Number(value) : value;
     this.setState({[className]: state_class});
   }
 
-  handleCreatureClick(creature_name) {
+  getCreature(record) {
+    if (!this.creatures_by_town.hasOwnProperty(record.town)) {
+      return {};
+    }
+
+    const matching = this.creatures_by_town[record.town].filter(
+      x => x.name === record.name
+    );
+
+    if (matching.length != 1) {
+      return {};
+    }
+
+    return matching[0];
+
+  }
+
+  handleCreatureClick(creature_name, town) {
     const class_name = this.state.toggle;
-    const data = Object.assign({}, this.state[class_name], STATS[creature_name]);
+    const creature = this.getCreature({
+      name: creature_name, town: town
+    });
+    console.log(creature);
+    const data = Object.assign({}, this.state[class_name], creature);
     setCookie(class_name, data);
     this.setState({
       [class_name]: data,
@@ -69,8 +108,14 @@ class Calc extends React.Component {
   }
 
   getByTown(town) {
-    const creature_names = ['marksman', 'griffin', 'angel'];
-    const creatures = creature_names.map(name => <Creature key={name} name={name} onClick={this.handleCreatureClick}/>);
+    if (!this.creatures_by_town.hasOwnProperty(town)) {
+      return <div></div>
+    }
+
+    const creatures = this.creatures_by_town[town].map(record => (
+      <Creature key={record.name} name={record.name} image={record.image}
+                town={town} onClick={this.handleCreatureClick}/>
+    ));
     return <div>{creatures}</div>
   }
 
@@ -85,13 +130,14 @@ class Calc extends React.Component {
           {this.renderInput('attacking', TITLES.level)}
           {this.renderInput('attacking', TITLES.attack)}
           {this.renderInput('attacking', TITLES.defense)}
-          {this.renderInput('attacking', TITLES.min_damage)}
-          {this.renderInput('attacking', TITLES.max_damage)}
+          {this.renderInput('attacking', TITLES.minimum_damage)}
+          {this.renderInput('attacking', TITLES.maximum_damage)}
           {this.renderInput('attacking', TITLES.health)}
           {this.renderInput('attacking', TITLES.speed)}
           {this.renderInput('attacking', TITLES.growth)}
-          {this.renderInput('attacking', TITLES.value)}
+          {this.renderInput('attacking', TITLES.ai_value)}
           {this.renderInput('attacking', TITLES.cost)}
+          {this.renderInput('attacking', TITLES.special)}
         </div>
         <div className={style.defending}>
           <h3>{TITLES.defending}</h3>
@@ -101,13 +147,14 @@ class Calc extends React.Component {
           {this.renderInput('defending', TITLES.level)}
           {this.renderInput('defending', TITLES.attack)}
           {this.renderInput('defending', TITLES.defense)}
-          {this.renderInput('defending', TITLES.min_damage)}
-          {this.renderInput('defending', TITLES.max_damage)}
+          {this.renderInput('defending', TITLES.minimum_damage)}
+          {this.renderInput('defending', TITLES.maximum_damage)}
           {this.renderInput('defending', TITLES.health)}
           {this.renderInput('defending', TITLES.speed)}
           {this.renderInput('defending', TITLES.growth)}
-          {this.renderInput('defending', TITLES.value)}
+          {this.renderInput('defending', TITLES.ai_value)}
           {this.renderInput('defending', TITLES.cost)}
+          {this.renderInput('defending', TITLES.special)}
         </div>
         <div className={style.result}>
           <CalcResult min={calcMin(this.state.attacking, this.state.defending)}
@@ -118,44 +165,25 @@ class Calc extends React.Component {
           Castle<br/>
           {this.getByTown('Castle')}
           <br/>Rampart<br/>
-          <Creature name="grand_elf" onClick={this.handleCreatureClick}/>
-          <Creature name="unicorn" onClick={this.handleCreatureClick}/>
-          <Creature name="green_dragon" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Rampart')}
           <br/>Tower<br/>
-          <Creature name="iron_golem" onClick={this.handleCreatureClick}/>
-          <Creature name="giant" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Tower')}
           <br/>Inferno<br/>
-          <Creature name="magog" onClick={this.handleCreatureClick}/>
-          <Creature name="efreet_sultan" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Inferno')}
           <br/>Necropolis<br/>
-          <Creature name="skeleton" onClick={this.handleCreatureClick}/>
-          <Creature name="vampire_lord" onClick={this.handleCreatureClick}/>
-          <Creature name="lich" onClick={this.handleCreatureClick}/>
-          <Creature name="dread_knight" onClick={this.handleCreatureClick}/>
-          <Creature name="bone_dragon" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Necropolis')}
           <br/>Dungeon<br/>
-          <Creature name="infernal_troglodyte" onClick={this.handleCreatureClick}/>
-          <Creature name="minotaur_king" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Dungeon')}
           <br/>Stronghold<br/>
-          <Creature name="wolf_raider" onClick={this.handleCreatureClick}/>
-          <Creature name="orc" onClick={this.handleCreatureClick}/>
-          <Creature name="roc" onClick={this.handleCreatureClick}/>
-          <Creature name="thunderbird" onClick={this.handleCreatureClick}/>
-          <Creature name="cyclops" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Stronghold')}
           <br/>Fortress<br/>
-          <Creature name="gnoll_marauder" onClick={this.handleCreatureClick}/>
-          <Creature name="lizard_warrior" onClick={this.handleCreatureClick}/>
-          <Creature name="dragon_fly" onClick={this.handleCreatureClick}/>
-          <Creature name="wyvern" onClick={this.handleCreatureClick}/>
-          <Creature name="wyvern_monarch" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Fortress')}
           <br/>Conflux<br/>
-          <Creature name="pixie" onClick={this.handleCreatureClick}/>
-          <Creature name="water_elemental" onClick={this.handleCreatureClick}/>
-          <Creature name="fire_elemental" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Conflux')}
           <br/>Cove<br/>
-          <Creature name="nix_warrior" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Cove')}
           <br/>Neutral<br/>
-          <Creature name="nomad" onClick={this.handleCreatureClick}/>
+          {this.getByTown('Neutral')}
         </div>
         <div className={style['creature-banks']}>
         <iframe title="Creature Banks" width="400" height="300" src="creature_banks.html"/>

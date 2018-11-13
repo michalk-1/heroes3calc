@@ -23,12 +23,12 @@ export function modifier(attack, defense) {
 
 export function calcMin(attacking, defending)
 {
-  return calcDamage(attacking, defending, 'min_damage');
+  return calcDamage(attacking, defending, 'minimum_damage');
 }
 
 export function calcMax(attacking, defending)
 {
-  return calcDamage(attacking, defending, 'max_damage');
+  return calcDamage(attacking, defending, 'maximum_damage');
 }
 
 export function calcDamage(attacking, defending, base_damage_name)
