@@ -10,7 +10,7 @@ export class Creatures extends React.Component {
     this.by_town = {};
     let creatures = this;
     TOWNS.forEach(function(town){
-      const uri = "http://localhost:5000/d/list_of_creatures?town=" + town;
+      const uri = window.location.origin + '/d/list_of_creatures?town=' + town;
       fetch(uri)
         .then(res => res.json())
         .then(
