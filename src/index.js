@@ -6,7 +6,7 @@ import { getCookie, setCookie } from './cookie-lib.js';
 import { toggleClass, calcMin, calcMax, totalHealth } from './calc-lib.js';
 import { CalcResult } from './components/CalcResult/index.js';
 import { CalcInput } from './components/CalcInput/index.js';
-import { Creature } from './components/Creature/index.js';
+import { Creatures } from './components/Creatures/index.js';
 
 class Calc extends React.Component {
   constructor(props) {
@@ -14,7 +14,6 @@ class Calc extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleCreatureClick = this.handleCreatureClick.bind(this);
     this.resetToggle = this.resetToggle.bind(this);
-    this.getByTown = this.getByTown.bind(this);
     this.state = {
       attacking: {
         additional_attack: 0,
@@ -30,23 +29,6 @@ class Calc extends React.Component {
     this.state.attacking = Object.assign({}, this.state.attacking, attacking);
     this.state.defending = Object.assign({}, this.state.defending, defending);
     this.state.toggle = 'attacking';
-    this.creatures_by_town = {};
-    let calc = this;
-    TOWNS.forEach(function(town){
-      const uri = "http://localhost:5000/d/list_of_creatures?town=" + town;
-      fetch(uri)
-        .then(res => res.json())
-        .then(
-          (result) => {
-            calc.creatures_by_town[town] = result['uri'];
-            calc.forceUpdate();
-          },
-          (error) => {
-            console.log(error);
-          }
-        )
-    });
-
   }
 
   resetToggle() {
@@ -76,47 +58,14 @@ class Calc extends React.Component {
     this.setState({[className]: state_class});
   }
 
-  getCreature(record) {
-    if (!this.creatures_by_town.hasOwnProperty(record.town)) {
-      return {};
-    }
-
-    const matching = this.creatures_by_town[record.town].filter(
-      x => x.name === record.name
-    );
-
-    if (matching.length != 1) {
-      return {};
-    }
-
-    return matching[0];
-
-  }
-
-  handleCreatureClick(creature_name, town) {
+  handleCreatureClick(creature) {
     const class_name = this.state.toggle;
-    const creature = this.getCreature({
-      name: creature_name, town: town
-    });
-    console.log(creature);
     const data = Object.assign({}, this.state[class_name], creature);
     setCookie(class_name, data);
     this.setState({
       [class_name]: data,
       toggle: toggleClass(class_name),
     });
-  }
-
-  getByTown(town) {
-    if (!this.creatures_by_town.hasOwnProperty(town)) {
-      return <div></div>
-    }
-
-    const creatures = this.creatures_by_town[town].map(record => (
-      <Creature key={record.name} name={record.name} image={record.image}
-                town={town} onClick={this.handleCreatureClick}/>
-    ));
-    return <div>{creatures}</div>
   }
 
   render() {
@@ -161,30 +110,7 @@ class Calc extends React.Component {
                       max={calcMax(this.state.attacking, this.state.defending)}
                       totalHealth={totalHealth(this.state.defending)}/>
         </div>
-        <div className={style.creatures}>
-          Castle<br/>
-          {this.getByTown('Castle')}
-          <br/>Rampart<br/>
-          {this.getByTown('Rampart')}
-          <br/>Tower<br/>
-          {this.getByTown('Tower')}
-          <br/>Inferno<br/>
-          {this.getByTown('Inferno')}
-          <br/>Necropolis<br/>
-          {this.getByTown('Necropolis')}
-          <br/>Dungeon<br/>
-          {this.getByTown('Dungeon')}
-          <br/>Stronghold<br/>
-          {this.getByTown('Stronghold')}
-          <br/>Fortress<br/>
-          {this.getByTown('Fortress')}
-          <br/>Conflux<br/>
-          {this.getByTown('Conflux')}
-          <br/>Cove<br/>
-          {this.getByTown('Cove')}
-          <br/>Neutral<br/>
-          {this.getByTown('Neutral')}
-        </div>
+        <Creatures onClick={this.handleCreatureClick}/>
         <div className={style['creature-banks']}>
         <iframe title="Creature Banks" width="400" height="300" src="creature_banks.html"/>
         </div>

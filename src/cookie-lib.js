@@ -1,6 +1,5 @@
 
 export function setCookie(name, value) {
-  console.log('setCookie', value);
   const cookie = [
     name, '=', JSON.stringify(value).replace(';', '&#59#&'), '; domain=',
     window.location.host.toString().split(':')[0] + '; path=/;'
