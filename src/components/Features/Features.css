@@ -1,3 +1,20 @@
-.features {
+.active {
+    border: 1px solid black;
+}
 
+.inactive {
+    border: 1px solid lightgray;
+}
+
+.features {
+    padding: 16.380px;
+}
+
+input {
+  display: block;
+  width: 100%;
+}
+
+h3 {
+    margin-top: 0px;
 }

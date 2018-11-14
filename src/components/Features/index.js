@@ -25,8 +25,10 @@ export class Features extends React.Component {
   }
 
   render() {
+    let current_style = this.props.active ? style.active : style.inactive;
+    current_style += ' ' + style.features;
     return (
-      <div className={style.features}>
+      <div className={current_style}>
         <h3>{TITLES[this.props.type]}</h3>
         {this.renderInput(TITLES.name)}
         {this.renderInput(TITLES.amount)}

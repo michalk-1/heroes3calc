@@ -46,13 +46,17 @@ class Calc extends React.Component {
   }
 
   render() {
+    const attacking_active = this.state.toggle === 'attacking';
+    const defending_active = this.state.toggle === 'defending';
     return (
       <div className={style.calc}>
         <div className={style.attacking}>
-          <Features type="attacking" values={this.state.attacking} onInputChange={this.handleInputChange}/>
+          <Features type="attacking" values={this.state.attacking}
+                    active={attacking_active} onInputChange={this.handleInputChange}/>
         </div>
         <div className={style.defending}>
-          <Features type="defending" values={this.state.defending} onInputChange={this.handleInputChange}/>
+          <Features type="defending" values={this.state.defending}
+                    active={defending_active} onInputChange={this.handleInputChange}/>
         </div>
         <div className={style['calc-result']}>
         <CalcResult min={calcMin(this.state.attacking, this.state.defending)}

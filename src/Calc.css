@@ -38,10 +38,6 @@ body {
   margin: 20px;
 }
 
-input {
-  display: block;
-}
-
 .board-row:after {
   clear: both;
   content: "";
