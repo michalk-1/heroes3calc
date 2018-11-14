@@ -22,6 +22,7 @@ class Calc extends React.Component {
 
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleCreatureClick = this.handleCreatureClick.bind(this);
+    this.handleFeaturesClick = this.handleFeaturesClick.bind(this);
     this.state = {
       attacking: attacking,
       defending: defending,
@@ -45,6 +46,10 @@ class Calc extends React.Component {
     });
   }
 
+  handleFeaturesClick(features_type) {
+    this.setState({toggle: features_type});
+  }
+
   render() {
     const attacking_active = this.state.toggle === 'attacking';
     const defending_active = this.state.toggle === 'defending';
@@ -52,11 +57,13 @@ class Calc extends React.Component {
       <div className={style.calc}>
         <div className={style.attacking}>
           <Features type="attacking" values={this.state.attacking}
-                    active={attacking_active} onInputChange={this.handleInputChange}/>
+                    active={attacking_active} onInputChange={this.handleInputChange}
+                    onClick={this.handleFeaturesClick}/>
         </div>
         <div className={style.defending}>
           <Features type="defending" values={this.state.defending}
-                    active={defending_active} onInputChange={this.handleInputChange}/>
+                    active={defending_active} onInputChange={this.handleInputChange}
+                    onClick={this.handleFeaturesClick}/>
         </div>
         <div className={style['calc-result']}>
         <CalcResult min={calcMin(this.state.attacking, this.state.defending)}

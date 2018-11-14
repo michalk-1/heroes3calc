@@ -7,6 +7,7 @@ export class Features extends React.Component {
   constructor(props) {
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this);
+    this.handleClick = this.handleClick.bind(this);
   }
 
   renderInput(title) {
@@ -24,11 +25,15 @@ export class Features extends React.Component {
     this.props.onInputChange(this.props.type, name, value);
   }
 
+  handleClick() {
+    this.props.onClick(this.props.type);
+  }
+
   render() {
     let current_style = this.props.active ? style.active : style.inactive;
     current_style += ' ' + style.features;
     return (
-      <div className={current_style}>
+      <div className={current_style} onClick={this.handleClick}>
         <h3>{TITLES[this.props.type]}</h3>
         {this.renderInput(TITLES.name)}
         {this.renderInput(TITLES.amount)}
