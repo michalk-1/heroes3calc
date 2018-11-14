@@ -1,6 +1,5 @@
 
 export function setCookie(name, value) {
-  console.log('setCookie', value);
   const cookie = [
     name, '=', JSON.stringify(value).replace(';', '&#59#&'), '; domain=',
     window.location.host.toString().split(':')[0] + '; path=/;'
@@ -19,9 +18,7 @@ export function getCookie(name) {
     return null;
   }
 
-  console.log(regex_match[1]);
   let result = regex_match[1].replace('&#59#&', ';');
-  console.log(result);
   result = JSON.parse(result);
   return result;
 }

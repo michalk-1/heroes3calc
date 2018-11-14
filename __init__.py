@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, url_for, redirect, request, jsonify
+from flask import Flask, render_template, url_for, redirect, request, jsonify, send_from_directory
 
 from .via import csv as via_csv
 
@@ -44,7 +44,17 @@ def create_app(test_config=None):
 
     @app.route('/d/list_of_creatures')
     def list_of_creatures():
-        query = {key: value for key, value in request.args.items() if key in allowed_queries}
+        query = {
+            key: value for key, value in request.args.items()
+            if key in allowed_queries
+        }
         return jsonify(via_csv.list_of_creatures(**query))
+
+    @app.route('/favicon.ico')
+    def favicon():
+        return send_from_directory(
+            app.root_path, 'favicon.ico',
+            mimetype='image/vnd.microsoft.icon'
+        )
 
     return app

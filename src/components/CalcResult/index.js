@@ -1,9 +1,10 @@
 import React from 'react';
+import style from './CalcResult.css';
 
 export class CalcResult extends React.Component {
   render() {
     return (
-      <div>
+      <div className={style['calc-result']}>
         <p>
           Damage:{' '}
           <span>{this.props.min}</span>

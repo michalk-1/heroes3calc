@@ -113,6 +113,13 @@ export const NUMBER_NAMES = [
   'speed',
 ]
 
+export const STRING_NAMES = [
+  'cost',
+  'level',
+  'name',
+  'special',
+]
+
 export const NAMES = Object.assign(
   ...Object.entries(TITLES).map(([k, v]) => ({[v]: k}))
 );
