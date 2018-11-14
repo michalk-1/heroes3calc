@@ -3,19 +3,26 @@
   grid-gap: 10px;
 }
 
-.attacking {
+.calc-result {
   grid-row: 1;
   grid-column: 1;
-}
-
-.result {
-  grid-row: 2;
-  grid-column: 2;
   margin-top: 0px;
 }
 
+.attacking {
+  grid-row: 2;
+  grid-column: 1;
+}
+
 .defending {
-  grid-row: 1;
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.creatures {
+  margin-left: 20px;
+  margin-right: 20px;
+  grid-row: 2;
   grid-column: 3;
 }
 
