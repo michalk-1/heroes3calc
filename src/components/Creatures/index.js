@@ -2,6 +2,7 @@ import React from 'react';
 import style from './Creatures.css';
 import { Creature } from '../Creature/index.js';
 import { TOWNS } from '../../data.js';
+import { parseObject } from '../../util.js';
 
 export class Creatures extends React.Component {
   constructor(props) {
@@ -38,7 +39,7 @@ export class Creatures extends React.Component {
       return {};
     }
 
-    return matching[0];
+    return parseObject(matching[0]);
 
   }
 

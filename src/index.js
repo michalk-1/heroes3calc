@@ -3,51 +3,45 @@ import ReactDOM from 'react-dom';
 import style from './Calc.css';
 import { NUMBER_NAMES, STRING_NAMES } from './data.js';
 import { getCookie, setCookie } from './cookie-lib.js';
-import { toggleClass, calcMin, calcMax, totalHealth } from './calc-lib.js';
+import { calcMin, calcMax, totalHealth } from './calc-lib.js';
 import { CalcResult } from './components/CalcResult/index.js';
 import { CalcInput } from './components/CalcInput/index.js';
 import { Creatures } from './components/Creatures/index.js';
 import { Features } from './components/Features/index.js';
+import { parseObject, parseType, toggleClass } from  './util.js';
 
 class Calc extends React.Component {
   constructor(props) {
     super(props);
+
+    let init = Object.assign(...NUMBER_NAMES.map(x => ({[x]: 0})));
+    init.amount = 1;
+    init = Object.assign(...STRING_NAMES.map(x => ({[x]: ''})), init);
+    const attacking = parseObject(Object.assign(init, getCookie('attacking')));
+    const defending = parseObject(Object.assign(init, getCookie('defending')));
+
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleCreatureClick = this.handleCreatureClick.bind(this);
-    this.resetToggle = this.resetToggle.bind(this);
-    let initial  = Object.assign(...NUMBER_NAMES.map(x => ({[x]: 0})));
-    initial.amount = 1;
-    initial  = Object.assign(...STRING_NAMES.map(x => ({[x]: ''})), initial);
     this.state = {
-      attacking: initial,
-      defending: Object.assign({}, initial),
-    }
-    const attacking = getCookie('attacking');
-    const defending = getCookie('defending');
-    this.state.attacking = Object.assign({}, this.state.attacking, attacking);
-    this.state.defending = Object.assign({}, this.state.defending, defending);
-    this.state.toggle = 'attacking';
-  }
-
-  resetToggle() {
-    if (this.state.toggle !== 'attacking') {
-      this.setState({toggle: 'attacking'});
+      attacking: attacking,
+      defending: defending,
+      toggle: 'attacking',
     }
   }
 
   handleInputChange(features_type, input_name, input_value) {
     let state_class = this.state[features_type];
-    state_class[input_name] = input_value
+    state_class[input_name] = parseType(input_name, input_value);
     this.setState({[features_type]: state_class});
   }
 
   handleCreatureClick(creature) {
-    const class_name = this.state.toggle;
-    const data = Object.assign({}, this.state[class_name], creature);
-    setCookie(class_name, data);
+    const features_type = this.state.toggle;
+    const data = Object.assign({}, this.state[features_type], creature);
+    setCookie(features_type, data);
     this.setState({
-      [class_name]: data,
-      toggle: toggleClass(class_name),
+      [features_type]: data,
+      toggle: toggleClass(features_type),
     });
   }
 

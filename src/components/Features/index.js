@@ -21,8 +21,7 @@ export class Features extends React.Component {
   }
 
   handleInputChange(name, value) {
-    const is_number = NUMBER_NAMES.indexOf(name) !== -1;
-    this.props.onInputChange(this.props.type, name, is_number ? Number(value) : value);
+    this.props.onInputChange(this.props.type, name, value);
   }
 
   render() {
