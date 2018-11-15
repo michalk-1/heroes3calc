@@ -5,6 +5,20 @@ function verifyIsNumber(obj, name) {
   }
 }
 
+function nonNegative(value) {
+  return value < 0 ? 0 : value;
+}
+
+export function calcLosses(army, damage) {
+  verifyIsNumber({damage: damage}, 'damage');
+  verifyIsNumber(army, 'amount');
+  verifyIsNumber(army, 'health');
+  const total_health = calcTotalHealth(army);
+  const remaining = Math.ceil(nonNegative((total_health - damage) / army.health));
+  const losses = army.amount - remaining;
+  return losses;
+}
+
 function modifier(attack, defense) {
   if (attack > defense) {
     return 0.05 * (attack - defense);
@@ -28,11 +42,11 @@ export function calcMax(attacking, defending)
 function calcDamage(attacking, defending, base_damage_name)
 {
   verifyIsNumber(attacking, 'additional_attack');
-  verifyIsNumber(defending, 'additional_defense');
-  verifyIsNumber(defending, 'attack');
-  verifyIsNumber(defending, 'defense');
+  verifyIsNumber(attacking, 'attack');
   verifyIsNumber(attacking, 'amount');
   verifyIsNumber(attacking, base_damage_name);
+  verifyIsNumber(defending, 'additional_defense');
+  verifyIsNumber(defending, 'defense');
   const result = attacking.amount * attacking[base_damage_name];
   let mod = 1 + modifier(attacking.attack + attacking.additional_attack, defending.defense + defending.additional_defense);
   mod = mod > 8.0 ? 8.0 : mod;
@@ -40,7 +54,7 @@ function calcDamage(attacking, defending, base_damage_name)
   return Math.round(result * mod);
 }
 
-export function totalHealth(defending)
+export function calcTotalHealth(defending)
 {
   verifyIsNumber(defending, 'amount');
   verifyIsNumber(defending, 'health');

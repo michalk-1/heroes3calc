@@ -3,9 +3,15 @@
   grid-gap: 10px;
 }
 
-.calc-result {
+.attack-result {
   grid-row: 1;
   grid-column: 1;
+  margin-top: 0px;
+}
+
+.retaliation-result {
+  grid-row: 1;
+  grid-column: 2;
   margin-top: 0px;
 }
 
