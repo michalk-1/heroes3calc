@@ -1,13 +1,22 @@
+
 function verifyIsNumber(obj, name) {
   if (typeof obj[name] !== 'number') {
     throw TypeError(name + " is not a number.");
   }
 }
 
-export function calcAverage(obj) {
-  verifyIsNumber(obj, 'min');
-  verifyIsNumber(obj, 'max');
-  return 0.5 * (obj.min + obj.max);
+function nonNegative(value) {
+  return value < 0 ? 0 : value;
+}
+
+export function calcLosses(army, damage) {
+  verifyIsNumber({damage: damage}, 'damage');
+  verifyIsNumber(army, 'amount');
+  verifyIsNumber(army, 'health');
+  const total_health = calcTotalHealth(army);
+  const remaining = Math.ceil(nonNegative((total_health - damage) / army.health));
+  const losses = army.amount - remaining;
+  return losses;
 }
 
 function modifier(attack, defense) {

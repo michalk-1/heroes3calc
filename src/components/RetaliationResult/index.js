@@ -1,12 +1,19 @@
 import React from 'react';
-import style from './AttackResult.css';
+import style from './RetaliationResult.css';
+import { calcAverage } from '../../calc-lib.js';
 
 
-export class AttackResult extends React.Component {
+export class RetaliationResult extends React.Component {
   render() {
-    console.log('render attack', this.props.minimum_damage)
     return (
-      <div className={style['attack-result']}>
+      <div className={style['retaliation-result']}>
+        <p>
+          Remaining:{' '}
+          <span>{this.props.minimum_units_left}</span>
+          {' '}-{' '}
+          <span>{this.props.maximum_units_left}</span>
+          {' '}(<span>avg {this.props.average_units_left}</span>)
+        </p>
         <p>
           Damage:{' '}
           <span>{this.props.minimum_damage}</span>
@@ -20,13 +27,6 @@ export class AttackResult extends React.Component {
           {' '}-{' '}
           <span>{this.props.maximum_kills}</span>
           {' '}(<span>avg {this.props.average_kills}</span>)
-        </p>
-        <p>
-          Remaining:{' '}
-          <span>{this.props.minimum_units_left}</span>
-          {' '}-{' '}
-          <span>{this.props.maximum_units_left}</span>
-          {' '}(<span>avg {this.props.average_units_left}</span>)
         </p>
       </div>
     );
