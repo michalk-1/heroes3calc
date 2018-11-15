@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import style from './Calc.css';
-import { NUMBER_NAMES, STRING_NAMES } from './data.js';
-import { getCookie, setCookie } from './cookie-lib.js';
-import { calcMin, calcMax, totalHealth } from './calc-lib.js';
-import { CalcResult } from './components/CalcResult/index.js';
+import { AttackResult } from './components/AttackResult/index.js';
 import { CalcInput } from './components/CalcInput/index.js';
+import { calcMin, calcMax, calcTotalHealth } from './calc-lib.js';
 import { Creatures } from './components/Creatures/index.js';
 import { Features } from './components/Features/index.js';
+import { getCookie, setCookie } from './cookie-lib.js';
+import { NUMBER_NAMES, STRING_NAMES } from './data.js';
 import { parseObject, parseType, toggleClass } from  './util.js';
 
 class Calc extends React.Component {
@@ -65,10 +65,12 @@ class Calc extends React.Component {
                     active={defending_active} onInputChange={this.handleInputChange}
                     onClick={this.handleFeaturesClick}/>
         </div>
-        <div className={style['calc-result']}>
-        <CalcResult min={calcMin(this.state.attacking, this.state.defending)}
-                    max={calcMax(this.state.attacking, this.state.defending)}
-                    totalHealth={totalHealth(this.state.defending)}/>
+        <div className={style['attack-result']}>
+          <AttackResult
+            min={calcMin(this.state.attacking, this.state.defending)}
+            max={calcMax(this.state.attacking, this.state.defending)}
+            total_health={calcTotalHealth(this.state.defending)}
+          />
         </div>
         <div className={style.creatures}>
           <Creatures onClick={this.handleCreatureClick}/>

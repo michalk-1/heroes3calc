@@ -1,7 +1,8 @@
 import React from 'react';
-import style from './CalcResult.css';
+import style from './AttackResult.css';
+import { calcAverage } from '../../calc-lib.js';
 
-export class CalcResult extends React.Component {
+export class AttackResult extends React.Component {
   render() {
     return (
       <div className={style['calc-result']}>
@@ -10,11 +11,11 @@ export class CalcResult extends React.Component {
           <span>{this.props.min}</span>
           {' '}-{' '}
           <span>{this.props.max}</span>
-          {' '}(<span>{0.5 * (this.props.min + this.props.max)}</span>)
+          {' '}(<span>{calcAverage(this.props)}</span>)
         </p>
         <p>
           Hitpoints:{' '}
-          <span>{this.props.totalHealth}</span>
+          <span>{this.props.total_health}</span>
         </p>
       </div>
     );

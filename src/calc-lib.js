@@ -1,8 +1,13 @@
-
 function verifyIsNumber(obj, name) {
   if (typeof obj[name] !== 'number') {
     throw TypeError(name + " is not a number.");
   }
+}
+
+export function calcAverage(obj) {
+  verifyIsNumber(obj, 'min');
+  verifyIsNumber(obj, 'max');
+  return 0.5 * (obj.min + obj.max);
 }
 
 function modifier(attack, defense) {
@@ -28,11 +33,11 @@ export function calcMax(attacking, defending)
 function calcDamage(attacking, defending, base_damage_name)
 {
   verifyIsNumber(attacking, 'additional_attack');
-  verifyIsNumber(defending, 'additional_defense');
-  verifyIsNumber(defending, 'attack');
-  verifyIsNumber(defending, 'defense');
+  verifyIsNumber(attacking, 'attack');
   verifyIsNumber(attacking, 'amount');
   verifyIsNumber(attacking, base_damage_name);
+  verifyIsNumber(defending, 'additional_defense');
+  verifyIsNumber(defending, 'defense');
   const result = attacking.amount * attacking[base_damage_name];
   let mod = 1 + modifier(attacking.attack + attacking.additional_attack, defending.defense + defending.additional_defense);
   mod = mod > 8.0 ? 8.0 : mod;
@@ -40,7 +45,7 @@ function calcDamage(attacking, defending, base_damage_name)
   return Math.round(result * mod);
 }
 
-export function totalHealth(defending)
+export function calcTotalHealth(defending)
 {
   verifyIsNumber(defending, 'amount');
   verifyIsNumber(defending, 'health');
