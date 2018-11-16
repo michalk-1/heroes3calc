@@ -15,7 +15,7 @@ class Calc extends React.Component {
   constructor(props) {
     super(props);
 
-    let init = Object.assign(...NUMBER_NAMES.map(x => ({[x]: 5})));
+    let init = Object.assign(...NUMBER_NAMES.map(x => ({[x]: 0})));
     init.amount = 1;
     init = Object.assign(...STRING_NAMES.map(x => ({[x]: ''})), init);
     const attacking = parseObject(Object.assign(init, getCookie('attacking')));
@@ -29,17 +29,17 @@ class Calc extends React.Component {
   }
 
   handleInputChange(features_type, input_name, input_value) {
-    let state_class = this.state[features_type];
-    state_class[input_name] = parseType(input_name, input_value);
+    let features = this.state[features_type];
+    features[input_name] = parseType(input_name, input_value);
+    this.setState(this.stateUpdateByType(this.state, features, features_type));
+  }
 
-    let res = undefined;
+  stateUpdateByType(state, features, features_type) {
     if (features_type === 'attacking') {
-      res = this.stateUpdate(this.state[features_type], this.state.defending);
+      return this.stateUpdate(features, this.state.defending);
     } else {
-      res = this.stateUpdate(this.state.attacking, this.state[features_type]);
+      return this.stateUpdate(this.state.attacking, features);
     }
-    console.log(res);
-    this.setState(res);
   }
 
   stateUpdate(attacking, defending) {
@@ -88,12 +88,11 @@ class Calc extends React.Component {
 
   handleCreatureClick(creature) {
     const features_type = this.state.toggle;
-    const data = Object.assign({}, this.state[features_type], creature);
-    setCookie(features_type, data);
-    this.setState({
-      [features_type]: data,
-      toggle: toggleClass(features_type),
-    });
+    const features = Object.assign({}, this.state[features_type], creature);
+    setCookie(features_type, features);
+    let state = this.stateUpdateByType(this.state, features, features_type);
+    state['toggle'] = toggleClass(features_type);
+    this.setState(state);
   }
 
   handleFeaturesClick(features_type) {
@@ -101,7 +100,6 @@ class Calc extends React.Component {
   }
 
   render() {
-    console.log('render', this.state.minimum_damage);
     const attacking_active = this.state.toggle === 'attacking';
     const defending_active = this.state.toggle === 'defending';
     return (

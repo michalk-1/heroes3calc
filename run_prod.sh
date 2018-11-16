@@ -18,6 +18,7 @@ __file="${__dir}/$(basename "${BASH_SOURCE[${__b3bp_tmp_source_idx:-0}]}")"
 __base="$(basename "${__file}" .sh)"
 
 export FLASK_APP=app
-export FLASK_ENV=development
+export FLASK_ENV=production
 cd ${__dir}
-flask run
+gunicorn --workers 4 --bind 127.0.0.1:${1:-5000} app
+

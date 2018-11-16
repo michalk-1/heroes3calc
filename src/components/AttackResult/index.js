@@ -4,7 +4,6 @@ import style from './AttackResult.css';
 
 export class AttackResult extends React.Component {
   render() {
-    console.log('render attack', this.props.minimum_damage)
     return (
       <div className={style['attack-result']}>
         <p>

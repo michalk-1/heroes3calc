@@ -31,7 +31,7 @@ module.exports = {
     ]
   },
   output: {
-    path: __dirname + '/a',
+    path: __dirname + '/app/a',
     filename: 'main.js'
   },
   plugins: [
