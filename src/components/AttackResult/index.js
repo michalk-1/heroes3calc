@@ -15,11 +15,11 @@ export class AttackResult extends React.Component {
           {' '}(<span>avg {this.props.average_damage}</span>)
         </p>
         <p>
-          Kills:{' '}
-          <span>{this.props.minimum_kills}</span>
+          Losses:{' '}
+          <span>{this.props.minimum_losses}</span>
           {' '}-{' '}
-          <span>{this.props.maximum_kills}</span>
-          {' '}(<span>avg {this.props.average_kills}</span>)
+          <span>{this.props.maximum_losses}</span>
+          {' '}(<span>avg {this.props.average_losses}</span>)
         </p>
         <p>
           Remaining:{' '}

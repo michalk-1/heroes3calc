@@ -8,11 +8,11 @@ export class RetaliationResult extends React.Component {
     return (
       <div className={style['retaliation-result']}>
         <p>
-          Remaining:{' '}
-          <span>{this.props.minimum_units_left}</span>
+          Losses:{' '}
+          <span>{this.props.minimum_losses}</span>
           {' '}-{' '}
-          <span>{this.props.maximum_units_left}</span>
-          {' '}(<span>avg {this.props.average_units_left}</span>)
+          <span>{this.props.maximum_losses}</span>
+          {' '}(<span>avg {this.props.average_losses}</span>)
         </p>
         <p>
           Damage:{' '}
@@ -22,11 +22,11 @@ export class RetaliationResult extends React.Component {
           {' '}(<span>avg {this.props.average_damage}</span>)
         </p>
         <p>
-          Kills:{' '}
-          <span>{this.props.minimum_kills}</span>
+          Remaining:{' '}
+          <span>{this.props.minimum_units_left}</span>
           {' '}-{' '}
-          <span>{this.props.maximum_kills}</span>
-          {' '}(<span>avg {this.props.average_kills}</span>)
+          <span>{this.props.maximum_units_left}</span>
+          {' '}(<span>avg {this.props.average_units_left}</span>)
         </p>
       </div>
     );
