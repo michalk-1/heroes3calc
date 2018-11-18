@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --mode development --open --hot",
-    "build-dev": "webpack --mode development",
+    "build-dev": "webpack --mode development && cp src/creature_banks.html app/a/",
     "build": "webpack --mode production && cp src/creature_banks.html app/a/"
   },
   "author": "Michal Kowalik",
