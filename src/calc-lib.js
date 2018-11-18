@@ -47,11 +47,17 @@ function calcDamage(attacking, defending, base_damage_name)
   verifyIsNumber(attacking, base_damage_name);
   verifyIsNumber(defending, 'additional_defense');
   verifyIsNumber(defending, 'defense');
-  const result = attacking.amount * attacking[base_damage_name];
-  let mod = 1 + modifier(attacking.attack + attacking.additional_attack, defending.defense + defending.additional_defense);
+  verifyIsNumber(defending, 'damage_reduction');
+
+  let mod = 1 + modifier(attacking.attack + attacking.additional_attack,
+                         defending.defense + defending.additional_defense);
   mod = mod > 8.0 ? 8.0 : mod;
   mod = mod < 0.01 ? 0.01 : mod;
-  return Math.round(result * mod);
+
+  let result = attacking.amount * attacking[base_damage_name];
+  result *= mod;
+  result *= 1 - defending.damage_reduction / 100;
+  return Math.round(result);
 }
 
 export function calcTotalHealth(defending)

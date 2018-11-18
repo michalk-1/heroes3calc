@@ -39,6 +39,7 @@ export class Features extends React.Component {
         {this.renderInput(TITLES.amount)}
         {this.renderInput(TITLES.additional_attack)}
         {this.renderInput(TITLES.additional_defense)}
+        {this.renderInput(TITLES.damage_reduction)}
         {this.renderInput(TITLES.level)}
         {this.renderInput(TITLES.attack)}
         {this.renderInput(TITLES.defense)}

@@ -1,7 +1,12 @@
 import { NUMBER_NAMES } from  './data.js';
 
 export function parseType(name, value) {
-  return NUMBER_NAMES.indexOf(name) === -1 ? value : Number(value);
+  if (NUMBER_NAMES.indexOf(name) === -1) {
+    const result = Number(value);
+    return Number.isNaN(result) ? 0 : result;
+  } else {
+    return value;
+  }
 }
 
 export function objectMap(obj, func) {
