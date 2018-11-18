@@ -9,6 +9,10 @@ function nonNegative(value) {
   return value < 0 ? 0 : value;
 }
 
+function nanToZero(value) {
+  return Number.isNaN(value) ? 0 : value;
+}
+
 export function calcLosses(army, damage) {
   verifyIsNumber({damage: damage}, 'damage');
   verifyIsNumber(army, 'amount');
@@ -16,7 +20,7 @@ export function calcLosses(army, damage) {
   const total_health = calcTotalHealth(army);
   const remaining = Math.ceil(nonNegative((total_health - damage) / army.health));
   const losses = army.amount - remaining;
-  return losses;
+  return nanToZero(losses);
 }
 
 function modifier(attack, defense) {
@@ -57,12 +61,13 @@ function calcDamage(attacking, defending, base_damage_name)
   let result = attacking.amount * attacking[base_damage_name];
   result *= mod;
   result *= 1 - defending.damage_reduction / 100;
-  return Math.round(result);
+  return nanToZero(Math.round(result));
 }
 
 export function calcTotalHealth(defending)
 {
   verifyIsNumber(defending, 'amount');
   verifyIsNumber(defending, 'health');
-  return defending.health * defending.amount;
+  const result = defending.health * defending.amount;
+  return nanToZero(result);
 }
