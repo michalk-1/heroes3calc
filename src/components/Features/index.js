@@ -34,7 +34,6 @@ export class Features extends React.Component {
     current_style += ' ' + style.features;
     return (
       <div className={current_style} onClick={this.handleClick}>
-        <h3>{TITLES[this.props.type]}</h3>
         {this.renderInput(TITLES.name)}
         {this.renderInput(TITLES.amount)}
         {this.renderInput(TITLES.additional_attack)}

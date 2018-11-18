@@ -8,7 +8,7 @@ import { calcMin, calcMax, calcTotalHealth, calcLosses } from './calc-lib.js';
 import { Creatures } from './components/Creatures/index.js';
 import { Features } from './components/Features/index.js';
 import { getCookie, setCookie } from './cookie-lib.js';
-import { NUMBER_NAMES, STRING_NAMES } from './data.js';
+import { NUMBER_NAMES, STRING_NAMES, TITLES } from './data.js';
 import { parseObject, parseType, toggleClass } from  './util.js';
 
 class Calc extends React.Component {
@@ -115,6 +115,7 @@ class Calc extends React.Component {
                     onClick={this.handleFeaturesClick}/>
         </div>
         <div className={style['attack-result']}>
+          <h3>{TITLES.attacking}</h3>
           <AttackResult
             minimum_damage={this.state.minimum_damage}
             average_damage={this.state.average_damage}
@@ -128,6 +129,7 @@ class Calc extends React.Component {
           />
         </div>
         <div className={style['retaliation-result']}>
+          <h3>{TITLES.defending}</h3>
           <RetaliationResult
             minimum_damage={this.state.defending_minimum_damage}
             average_damage={this.state.defending_average_damage}
