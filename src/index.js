@@ -142,6 +142,14 @@ class Calc extends React.Component {
             maximum_units_left={this.state.defending_maximum_units_left}
           />
         </div>
+        <div className='tips'>
+          <h3>Tips</h3>
+          <div style={{padding: 16.38 + 'px'}}>
+            <p>Archery: add 2, 5, or 10 to the Additional Attack field.</p>
+            <p>Offense: add 2, 4, or 6 to the Additional Attack field.</p>
+            <p>Armorer: put the value (5, 10, or 15) in the Damage Reduction field.</p>
+          </div>
+        </div>
         <div className={style.creatures}>
           <Creatures onClick={this.handleCreatureClick}/>
         </div>
