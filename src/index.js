@@ -28,9 +28,10 @@ class Calc extends React.Component {
     this.state = Object.assign({toggle: 'attacking'}, state_update);
   }
 
-  handleInputChange(features_type, input_name, input_value) {
+  handleInputChange(features_type, input_name, input_value, previous_value) {
     let features = this.state[features_type];
-    features[input_name] = parseType(input_name, input_value);
+    console.log(arguments);
+    features[input_name] = parseType(input_name, input_value, previous_value);
     this.setState(this.stateUpdateByType(this.state, features, features_type));
   }
 

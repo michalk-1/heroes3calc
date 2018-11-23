@@ -2,18 +2,21 @@ import { NUMBER_NAMES } from  './data.js';
 
 export const REGEX_NUMBER = /^\+?(0*)((0|[1-9]\d*)(\.\d*)?)$/;
 
-export function parseType(name, value) {
+export function parseType(name, value, previous_value) {
   if (NUMBER_NAMES.indexOf(name) !== -1) {
-    return parseNumber(value);
+    return parseNumber(value, previous_value);
   } else {
     return value;
   }
 }
 
-function parseNumber(value) {
+function parseNumber(value, previous_value) {
   value = String(value);
   const re = value.match(REGEX_NUMBER);
-  if (re === null) return '0';
+  if (re === null) {
+    if (previous_value === undefined) return '0';
+    else return previous_value;
+  }
   return re[2];
 }
 

@@ -8,6 +8,7 @@ export class Features extends React.Component {
     super(props);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleClick = this.handleClick.bind(this);
+    this.state = {};
   }
 
   renderInput(title) {
@@ -22,7 +23,8 @@ export class Features extends React.Component {
   }
 
   handleInputChange(name, value) {
-    this.props.onInputChange(this.props.type, name, value);
+    this.props.onInputChange(this.props.type, name, value, this.state[name]);
+    this.setState({[name]: value});
   }
 
   handleClick() {
