@@ -1,18 +1,20 @@
 import { NUMBER_NAMES } from  './data.js';
 
+export const REGEX_NUMBER = /^\+?(0*)((0|[1-9]\d*)(\.\d*)?)$/;
+
 export function parseType(name, value) {
   if (NUMBER_NAMES.indexOf(name) !== -1) {
-    let result = Number(value);
-    result = Number.isNaN(result) ? 0 : result;
-    result = result < 0 ? 0 : result;
-    if (name === 'damage_reduction') {
-      return result > 100 ? 100 : result;
-    } else {
-      return result;
-    }
+    return parseNumber(value);
   } else {
     return value;
   }
+}
+
+function parseNumber(value) {
+  value = String(value);
+  const re = value.match(REGEX_NUMBER);
+  if (re === null) return '0';
+  return re[2];
 }
 
 export function objectMap(obj, func) {
