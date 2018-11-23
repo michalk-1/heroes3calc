@@ -20,4 +20,4 @@ __base="$(basename "${__file}" .sh)"
 export FLASK_APP=app
 export FLASK_ENV=production
 cd ${__dir}
-gunicorn --workers 4 --bind 0.0.0.0:${PORT:-5000} app
+gunicorn --workers $(nproc --all) --bind 0.0.0.0:${PORT:-5000} app
