@@ -12,6 +12,7 @@ export function parseType(name, value, previous_value) {
 
 function parseNumber(value, previous_value) {
   value = String(value);
+  if (value === '') return '0';
   const re = value.match(REGEX_NUMBER);
   if (re === null) {
     if (previous_value === undefined) return '0';
