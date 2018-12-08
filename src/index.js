@@ -9,7 +9,7 @@ import { Creatures } from './components/Creatures/index.js';
 import { Features } from './components/Features/index.js';
 import { getCookie, setCookie } from './cookie-lib.js';
 import { NUMBER_NAMES, STRING_NAMES, TITLES } from './data.js';
-import { parseObject, parseType, toggleClass } from  './util.js';
+import { parseObject, toggleClass } from  './util.js';
 
 class Calc extends React.Component {
   constructor(props) {
@@ -28,10 +28,9 @@ class Calc extends React.Component {
     this.state = Object.assign({toggle: 'attacking'}, state_update);
   }
 
-  handleInputChange(features_type, input_name, input_value, previous_value) {
+  handleInputChange(features_type, input_name, parsed_value) {
     let features = this.state[features_type];
-    console.log(arguments);
-    features[input_name] = parseType(input_name, input_value, previous_value);
+    features[input_name] = parsed_value;
     this.setState(this.stateUpdateByType(this.state, features, features_type));
   }
 
