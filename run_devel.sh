@@ -2,7 +2,7 @@
 source $HOME/.virtualenvs/h3calc/bin/activate
 
 # Exit on error. Append "|| true" if you expect an error.
-set -o errexit  
+set -o errexit
 # Exit on error inside any functions or subshells.
 set -o errtrace
 # Do not allow use of undefined vars. Use ${VAR:-} to use an undefined VAR
@@ -19,5 +19,6 @@ __base="$(basename "${__file}" .sh)"
 
 export FLASK_APP=app
 export FLASK_ENV=development
+npm run build-dev
 cd ${__dir}
 flask run
