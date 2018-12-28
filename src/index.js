@@ -153,7 +153,7 @@ class Calc extends React.Component {
         <div className={style.creatures}>
           <Creatures onClick={this.handleCreatureClick}/>
         </div>
-        <div className={style['creature-banks']}>
+        <div className={style.fight_logs}>
           {this.state.attacking.amount} attacking creatures do {this.state.minimum_damage} - {this.state.maximum_damage} damage.<br/>
           {this.state.defending_minimum_losses} - {this.state.defending_maximum_losses} defending creatures perish.<br/>
           {this.state.defending_minimum_units_left} - {this.state.defending_maximum_units_left} defending creatures remain and do
