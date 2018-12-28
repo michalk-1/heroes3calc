@@ -154,7 +154,12 @@ class Calc extends React.Component {
           <Creatures onClick={this.handleCreatureClick}/>
         </div>
         <div className={style['creature-banks']}>
-          <iframe title="Creature Banks" width="400" height="300" src="creature_banks.html"/>
+          {this.state.attacking.amount} attacking creatures do {this.state.minimum_damage} - {this.state.maximum_damage} damage.<br/>
+          {this.state.defending_minimum_losses} - {this.state.defending_maximum_losses} defending creatures perish.<br/>
+          {this.state.defending_minimum_units_left} - {this.state.defending_maximum_units_left} defending creatures remain and do
+          {' '}{this.state.defending_minimum_damage} - {this.state.defending_maximum_damage} damage.<br/>
+          {this.state.minimum_losses} - {this.state.maximum_losses} attacking creatures perish and
+          {' '}{this.state.minimum_units_left} - {this.state.maximum_units_left} remain.<br/>
         </div>
       </div>
     );
