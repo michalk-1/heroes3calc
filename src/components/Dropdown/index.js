@@ -77,30 +77,19 @@ export function matchStateToTerm(state, value) {
 
 export class Dropdown extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {};
-    this.state.value = this.props.value;
-  }
-
-  onChange(event, value) {
-    this.setState({value: value});
-    this.props.onChange(event);
-  }
-
   render() {
     return (
       <div>
         <Autocomplete
-          value={this.state.value}
+          value={this.props.value}
           inputProps={{ id: 'states-autocomplete' }}
           wrapperStyle={{ display: 'block' }}
           items={getStates()}
           getItemValue={(item) => item.name}
           shouldItemRender={matchStateToTerm}
           sortItems={sortStates}
-          onChange={(event, value) => this.onChange(event, value)}
-          onSelect={value => this.setState({ value })}
+          onChange={(ev, value) => this.props.onChange(value)}
+          onSelect={value => this.props.onChange(value)}
           renderMenu={children => (
             <div className="menu">
               {children}

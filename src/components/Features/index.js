@@ -19,7 +19,7 @@ export class Features extends React.Component {
       <div>
         <span>{title}: </span>
         <CalcInput value={this.props.values[name]}
-                   onChange={(ev) => this.handleInputChange(name, ev.target.value)}/>
+                   onChange={value => this.handleInputChange(name, value)}/>
       </div>
     );
   }
@@ -30,7 +30,7 @@ export class Features extends React.Component {
       <div>
         <span>{title}: </span>
         <Dropdown value={this.props.values[name]}
-                  onChange={(ev) => this.handleInputChange(name, ev.target.value)}/>
+                  onChange={value => this.handleInputChange(name, value)}/>
       </div>
     );
   }
@@ -40,6 +40,7 @@ export class Features extends React.Component {
     const parsed_value = parseType(name, value, previous_value)
     this.props.onInputChange(this.props.type, name, parsed_value);
     this.setState({[name]: parsed_value});
+    return parsed_value;
   }
 
   handleClick() {
