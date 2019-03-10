@@ -84,9 +84,8 @@ export class Dropdown extends Component {
   }
 
   onChange(event, value) {
-    console.log(this, value);
     this.setState({value: value});
-    this.props.onChange()
+    this.props.onChange(event);
   }
 
   render() {

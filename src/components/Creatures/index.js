@@ -9,14 +9,19 @@ export class Creatures extends React.Component {
     super(props);
     this.handleCreatureClick = this.handleCreatureClick.bind(this);
     this.by_town = {};
+    this.by_name = {};
     let creatures = this;
     TOWNS.forEach(function(town){
       const uri = window.location.origin + '/d/list_of_creatures?town=' + town;
       fetch(uri)
-        .then(res => res.json())
+        .then(response => response.json())
         .then(
-          (result) => {
-            creatures.by_town[town] = result['uri'];
+          (json_response) => {
+            const data = json_response['uri'];
+            creatures.by_town[town] = data;
+            data.forEach(function(creature) {
+              creatures.by_name[creature.name] = creature;
+            });
             creatures.forceUpdate();
           },
           (error) => {
@@ -27,12 +32,28 @@ export class Creatures extends React.Component {
   }
 
   getCreature(record) {
-    if (!this.by_town.hasOwnProperty(record.town)) {
+    if (!record.hasOwnProperty('name')) {
       return {};
     }
 
-    const matching = this.by_town[record.town].filter(
-      x => x.name === record.name
+    if (record.hasOwnProperty('town')) {
+      return this.getCreatureFromTown(record.town, record.name);
+    }
+
+    return this.getCreatureByName(record.name);
+  }
+
+  getCreatureByName(name) {
+    return this.by_name[name];
+  }
+
+  getCreatureFromTown(town, name) {
+    if (!this.by_town.hasOwnProperty(town)) {
+      return {};
+    }
+
+    const matching = this.by_town[town].filter(
+      x => x.name === name
     );
 
     if (matching.length != 1) {
@@ -40,17 +61,14 @@ export class Creatures extends React.Component {
     }
 
     return parseObject(matching[0]);
-
   }
 
-  handleCreatureClick(creature_name, town) {
-    const creature = this.getCreature({
-      name: creature_name, town: town
-    });
+  handleCreatureClick(creature_name) {
+    const creature = this.getCreature({name: creature_name});
     this.props.onClick(creature);
   }
 
-  getByTown(town) {
+  getCreaturesFromTown(town) {
     if (!this.by_town.hasOwnProperty(town)) {
       return <div></div>
     }
@@ -66,27 +84,27 @@ export class Creatures extends React.Component {
     return (
       <div className={style.creatures}>
         Castle<br/>
-        {this.getByTown('Castle')}
+        {this.getCreaturesFromTown('Castle')}
         <br/>Rampart<br/>
-        {this.getByTown('Rampart')}
+        {this.getCreaturesFromTown('Rampart')}
         <br/>Tower<br/>
-        {this.getByTown('Tower')}
+        {this.getCreaturesFromTown('Tower')}
         <br/>Inferno<br/>
-        {this.getByTown('Inferno')}
+        {this.getCreaturesFromTown('Inferno')}
         <br/>Necropolis<br/>
-        {this.getByTown('Necropolis')}
+        {this.getCreaturesFromTown('Necropolis')}
         <br/>Dungeon<br/>
-        {this.getByTown('Dungeon')}
+        {this.getCreaturesFromTown('Dungeon')}
         <br/>Stronghold<br/>
-        {this.getByTown('Stronghold')}
+        {this.getCreaturesFromTown('Stronghold')}
         <br/>Fortress<br/>
-        {this.getByTown('Fortress')}
+        {this.getCreaturesFromTown('Fortress')}
         <br/>Conflux<br/>
-        {this.getByTown('Conflux')}
+        {this.getCreaturesFromTown('Conflux')}
         <br/>Cove<br/>
-        {this.getByTown('Cove')}
+        {this.getCreaturesFromTown('Cove')}
         <br/>Neutral<br/>
-        {this.getByTown('Neutral')}
+        {this.getCreaturesFromTown('Neutral')}
       </div>
     );
   }
