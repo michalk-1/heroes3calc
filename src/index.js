@@ -7,7 +7,7 @@ import { CalcInput } from './components/CalcInput/index.js';
 import { calcMin, calcMax, calcTotalHealth, calcLosses } from './calc-lib.js';
 import { Creatures } from './components/Creatures/index.js';
 import { Features } from './components/Features/index.js';
-import { MyDropdown } from './components/Dropdown/index.js';
+import { Dropdown } from './components/Dropdown/index.js';
 import { getCookie, setCookie } from './cookie-lib.js';
 import { NUMBER_NAMES, STRING_NAMES, TITLES } from './data.js';
 import { parseObject, toggleClass } from  './util.js';
@@ -161,9 +161,6 @@ class Calc extends React.Component {
           {' '}{this.state.defending_minimum_damage} - {this.state.defending_maximum_damage} damage.<br/>
           {this.state.minimum_losses} - {this.state.maximum_losses} attacking creatures perish and
           {' '}{this.state.minimum_units_left} - {this.state.maximum_units_left} remain.<br/>
-        </div>
-        <div>
-          <MyDropdown />
         </div>
       </div>
     );

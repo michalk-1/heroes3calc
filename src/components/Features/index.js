@@ -3,6 +3,7 @@ import { NAMES, NUMBER_NAMES, TITLES } from './../../data.js';
 import style from './Features.css';
 import { CalcInput } from '../CalcInput/index.js';
 import { parseType } from  './../../util.js';
+import { Dropdown } from '../Dropdown/index.js';
 
 export class Features extends React.Component {
   constructor(props) {
@@ -23,6 +24,17 @@ export class Features extends React.Component {
     );
   }
 
+  renderDropdown(title) {
+    const name = NAMES[title];
+    return (
+      <div>
+        <span>{title}: </span>
+        <Dropdown value={this.props.values[name]}
+                  onChange={(ev) => this.handleInputChange(name, ev.target.value)}/>
+      </div>
+    );
+  }
+
   handleInputChange(name, value) {
     const previous_value = this.state[name];
     const parsed_value = parseType(name, value, previous_value)
@@ -39,7 +51,7 @@ export class Features extends React.Component {
     current_style += ' ' + style.features;
     return (
       <div className={current_style} onClick={this.handleClick}>
-        {this.renderInput(TITLES.name)}
+        {this.renderDropdown(TITLES.name)}
         {this.renderInput(TITLES.amount)}
         {this.renderInput(TITLES.additional_attack)}
         {this.renderInput(TITLES.additional_defense)}
