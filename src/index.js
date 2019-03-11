@@ -4,7 +4,7 @@ import style from './Calc.css';
 import { AttackResult } from './components/AttackResult/index.js';
 import { RetaliationResult } from './components/RetaliationResult/index.js';
 import { CalcInput } from './components/CalcInput/index.js';
-import { calcMin, calcMax, calcTotalHealth, calcLosses } from './calc-lib.js';
+import { stateUpdate } from './calc-lib.js';
 import { Creatures } from './components/Creatures/index.js';
 import { Features } from './components/Features/index.js';
 import { Dropdown } from './components/Dropdown/index.js';
@@ -25,7 +25,7 @@ class Calc extends React.Component {
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleCreatureClick = this.handleCreatureClick.bind(this);
     this.handleFeaturesClick = this.handleFeaturesClick.bind(this);
-    const state_update = this.stateUpdate(attacking, defending);
+    const state_update = stateUpdate(attacking, defending);
     this.state = Object.assign({toggle: 'attacking'}, state_update);
   }
 
@@ -37,54 +37,10 @@ class Calc extends React.Component {
 
   stateUpdateByType(state, features, features_type) {
     if (features_type === 'attacking') {
-      return this.stateUpdate(features, this.state.defending);
+      return stateUpdate(features, this.state.defending);
     } else {
-      return this.stateUpdate(this.state.attacking, features);
+      return stateUpdate(this.state.attacking, features);
     }
-  }
-
-  stateUpdate(attacking, defending) {
-    const minimum_damage = calcMin(attacking, defending);
-    const maximum_damage = calcMax(attacking, defending);
-    const average_damage = 0.5 * (minimum_damage + maximum_damage);
-    const defending_total_health = calcTotalHealth(defending);
-    const defending_minimum_losses = calcLosses(defending, minimum_damage)
-    const defending_average_losses = calcLosses(defending, average_damage)
-    const defending_maximum_losses = calcLosses(defending, maximum_damage)
-    const defending_minimum_units_left = defending.amount - defending_maximum_losses;
-    const defending_average_units_left = defending.amount - defending_average_losses;
-    const defending_maximum_units_left = defending.amount - defending_minimum_losses;
-    const defending_minimum_damage = calcMin(Object.assign({}, defending, {amount: defending_minimum_units_left}), attacking);
-    const defending_maximum_damage = calcMax(Object.assign({}, defending, {amount: defending_maximum_units_left}), attacking);
-    const defending_average_damage = 0.5 * (defending_minimum_damage + defending_maximum_damage);
-    const minimum_losses = calcLosses(attacking, defending_minimum_damage);
-    const average_losses = calcLosses(attacking, defending_average_damage);
-    const maximum_losses = calcLosses(attacking, defending_maximum_damage);
-    const minimum_units_left = attacking.amount - maximum_losses;
-    const average_units_left = attacking.amount - average_losses;
-    const maximum_units_left = attacking.amount - minimum_losses;
-    return {
-      attacking: attacking,
-      defending: defending,
-      minimum_damage: minimum_damage,
-      average_damage: average_damage,
-      maximum_damage: maximum_damage,
-      minimum_losses: minimum_losses,
-      average_losses: average_losses,
-      maximum_losses: maximum_losses,
-      minimum_units_left: minimum_units_left,
-      average_units_left: average_units_left,
-      maximum_units_left: maximum_units_left,
-      defending_minimum_damage: defending_minimum_damage,
-      defending_average_damage: defending_average_damage,
-      defending_maximum_damage: defending_maximum_damage,
-      defending_minimum_losses: defending_minimum_losses,
-      defending_average_losses: defending_average_losses,
-      defending_maximum_losses: defending_maximum_losses,
-      defending_minimum_units_left: defending_minimum_units_left,
-      defending_average_units_left: defending_average_units_left,
-      defending_maximum_units_left: defending_maximum_units_left,
-    };
   }
 
   handleCreatureClick(creature) {

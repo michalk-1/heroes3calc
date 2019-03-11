@@ -1,15 +1,17 @@
 import React from 'react';
 import style from './Creatures.css';
 import { Creature } from '../Creature/index.js';
-import { TOWNS } from '../../data.js';
+import { TOWNS, SKELETON, SKELETON_WARRIOR } from '../../data.js';
 import { parseObject } from '../../util.js';
+
 
 export class Creatures extends React.Component {
   constructor(props) {
     super(props);
     this.handleCreatureClick = this.handleCreatureClick.bind(this);
-    this.by_town = {};
-    this.by_name = {};
+    this.by_town = {[SKELETON['town']]: [SKELETON, SKELETON_WARRIOR]};
+    this.by_name = {[SKELETON['name']]: SKELETON,
+                    [SKELETON_WARRIOR['name']]: SKELETON_WARRIOR};
     let creatures = this;
     TOWNS.forEach(function(town){
       const uri = window.location.origin + '/d/list_of_creatures?town=' + town;
