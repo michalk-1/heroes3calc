@@ -15,28 +15,22 @@ import { parseObject, toggleClass } from  './util.js';
 class Calc extends React.Component {
   constructor(props) {
     super(props);
-
-    let init = Object.assign(...NUMBER_NAMES.map(x => ({[x]: 0})));
-    init.amount = 1;
-    init = Object.assign(...STRING_NAMES.map(x => ({[x]: ''})), init);
+    const init = Calc.emptyForm();
     const attacking = parseObject(Object.assign(init, getCookie('attacking')));
     const defending = parseObject(Object.assign(init, getCookie('defending')));
-
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.handleCreatureClick = this.handleCreatureClick.bind(this);
-    this.handleFeaturesClick = this.handleFeaturesClick.bind(this);
     const state_update = stateUpdate(attacking, defending);
     this.state = Object.assign({toggle: 'attacking'}, state_update);
     this.state.creature_data = new CreatureData(this);
   }
 
-  handleInputChange(features_type, input_name, parsed_value) {
-    let features = this.state[features_type];
-    features[input_name] = parsed_value;
-    this.setState(this.stateUpdateByType(this.state, features, features_type));
+  static emptyForm() {
+    let init = Object.assign(...NUMBER_NAMES.map(x => ({[x]: 0})));
+    init.amount = 1;
+    init = Object.assign(...STRING_NAMES.map(x => ({[x]: ''})), init);
+    return init
   }
 
-  stateUpdateByType(state, features, features_type) {
+  stateUpdateByType(features, features_type) {
     if (features_type === 'attacking') {
       return stateUpdate(features, this.state.defending);
     } else {
@@ -44,17 +38,23 @@ class Calc extends React.Component {
     }
   }
 
+  handleInputChange(features_type, input_name, parsed_value) {
+    let features = this.state[features_type];
+    features[input_name] = parsed_value;
+    this.setState(this.stateUpdateByType(features, features_type));
+  }
+
   handleCreatureClick(creature) {
     const features_type = this.state.toggle;
     const features = Object.assign({}, this.state[features_type], creature);
     setCookie(features_type, features);
-    let state = this.stateUpdateByType(this.state, features, features_type);
+    let state = this.stateUpdateByType(features, features_type);
     state['toggle'] = toggleClass(features_type);
     this.setState(state);
   }
 
-  handleFeaturesClick(features_type) {
-    this.setState({toggle: features_type});
+  handleFeaturesClick(type) {
+    this.setState({toggle: type});
   }
 
   render() {
@@ -64,13 +64,13 @@ class Calc extends React.Component {
       <div className={style.calc}>
         <div className={style.attacking}>
           <Features type="attacking" values={this.state.attacking}
-                    active={attacking_active} onInputChange={this.handleInputChange}
-                    onClick={this.handleFeaturesClick}/>
+                    active={attacking_active} onInputChange={(...xs) => this.handleInputChange(...xs)}
+                    onClick={type => this.handleFeaturesClick(type)}/>
         </div>
         <div className={style.defending}>
           <Features type="defending" values={this.state.defending}
-                    active={defending_active} onInputChange={this.handleInputChange}
-                    onClick={this.handleFeaturesClick}/>
+                    active={defending_active} onInputChange={(...xs) => this.handleInputChange(...xs)}
+                    onClick={type => this.handleFeaturesClick(type)}/>
         </div>
         <div className={style['attack-result']}>
           <h3>{TITLES.attacking}</h3>
@@ -109,7 +109,7 @@ class Calc extends React.Component {
           </div>
         </div>
         <div className={style.creatures}>
-          <Creatures creature_data={this.state.creature_data} onClick={this.handleCreatureClick}/>
+          <Creatures creature_data={this.state.creature_data} onClick={creature => this.handleCreatureClick(creature)}/>
         </div>
         <div className={style.fight_logs}>
           {this.state.attacking.amount} attacking creatures do {this.state.minimum_damage} - {this.state.maximum_damage} damage.<br/>
