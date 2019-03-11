@@ -5,11 +5,11 @@ import { TOWNS, SKELETON, SKELETON_WARRIOR } from '../../data.js';
 import { parseObject } from '../../util.js';
 
 export class CreatureData {
-  constructor() {
+  constructor(owner) {
     this.by_town = {[SKELETON['town']]: [SKELETON, SKELETON_WARRIOR]};
     this.by_name = {[SKELETON['name']]: SKELETON,
                     [SKELETON_WARRIOR['name']]: SKELETON_WARRIOR};
-    let creatures = this;
+    let that = this;
     TOWNS.forEach(function(town){
       const uri = window.location.origin + '/d/list_of_creatures?town=' + town;
       fetch(uri)
@@ -17,11 +17,11 @@ export class CreatureData {
         .then(
           (json_response) => {
             const data = json_response['uri'];
-            creatures.by_town[town] = data;
+            that.by_town[town] = data;
             data.forEach(function(creature) {
-              creatures.by_name[creature.name] = creature;
+              that.by_name[creature.name] = creature;
             });
-            creatures.forceUpdate();
+            owner.forceUpdate();
           },
           (error) => {
             console.log(error);

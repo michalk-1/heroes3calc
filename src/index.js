@@ -27,7 +27,7 @@ class Calc extends React.Component {
     this.handleFeaturesClick = this.handleFeaturesClick.bind(this);
     const state_update = stateUpdate(attacking, defending);
     this.state = Object.assign({toggle: 'attacking'}, state_update);
-    this.creature_data = new CreatureData();
+    this.state.creature_data = new CreatureData(this);
   }
 
   handleInputChange(features_type, input_name, parsed_value) {
@@ -109,7 +109,7 @@ class Calc extends React.Component {
           </div>
         </div>
         <div className={style.creatures}>
-          <Creatures creature_data={this.creature_data} onClick={this.handleCreatureClick}/>
+          <Creatures creature_data={this.state.creature_data} onClick={this.handleCreatureClick}/>
         </div>
         <div className={style.fight_logs}>
           {this.state.attacking.amount} attacking creatures do {this.state.minimum_damage} - {this.state.maximum_damage} damage.<br/>
