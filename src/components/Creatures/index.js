@@ -4,11 +4,8 @@ import { Creature } from '../Creature/index.js';
 import { TOWNS, SKELETON, SKELETON_WARRIOR } from '../../data.js';
 import { parseObject } from '../../util.js';
 
-
-export class Creatures extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleCreatureClick = this.handleCreatureClick.bind(this);
+export class CreatureData {
+  constructor() {
     this.by_town = {[SKELETON['town']]: [SKELETON, SKELETON_WARRIOR]};
     this.by_name = {[SKELETON['name']]: SKELETON,
                     [SKELETON_WARRIOR['name']]: SKELETON_WARRIOR};
@@ -50,7 +47,7 @@ export class Creatures extends React.Component {
   }
 
   getCreatureFromTown(town, name) {
-    if (!this.by_town.hasOwnProperty(town)) {
+    if (!this.hasTown(town)) {
       return {};
     }
 
@@ -65,19 +62,35 @@ export class Creatures extends React.Component {
     return parseObject(matching[0]);
   }
 
+  hasTown(town) {
+    return this.by_town.hasOwnProperty(town);
+  }
+
+  getTown(town) {
+    return this.by_town[town];
+  }
+}
+
+export class Creatures extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.creature_data = this.props.creature_data;
+  }
+
   handleCreatureClick(creature_name) {
-    const creature = this.getCreature({name: creature_name});
+    const creature = this.creature_data.getCreature({name: creature_name});
     this.props.onClick(creature);
   }
 
   getCreaturesFromTown(town) {
-    if (!this.by_town.hasOwnProperty(town)) {
+    if (!this.creature_data.hasTown(town)) {
       return <div></div>
     }
 
-    const creatures = this.by_town[town].map(record => (
+    const creatures = this.creature_data.getTown(town).map(record => (
       <Creature key={record.name} name={record.name} image={record.image}
-                town={town} onClick={this.handleCreatureClick}/>
+                town={town} onClick={name => this.handleCreatureClick(name)}/>
     ));
     return <div>{creatures}</div>
   }

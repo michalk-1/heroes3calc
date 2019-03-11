@@ -5,7 +5,7 @@ import { AttackResult } from './components/AttackResult/index.js';
 import { RetaliationResult } from './components/RetaliationResult/index.js';
 import { CalcInput } from './components/CalcInput/index.js';
 import { stateUpdate } from './calc-lib.js';
-import { Creatures } from './components/Creatures/index.js';
+import { CreatureData, Creatures } from './components/Creatures/index.js';
 import { Features } from './components/Features/index.js';
 import { Dropdown } from './components/Dropdown/index.js';
 import { getCookie, setCookie } from './cookie-lib.js';
@@ -27,6 +27,7 @@ class Calc extends React.Component {
     this.handleFeaturesClick = this.handleFeaturesClick.bind(this);
     const state_update = stateUpdate(attacking, defending);
     this.state = Object.assign({toggle: 'attacking'}, state_update);
+    this.creature_data = new CreatureData();
   }
 
   handleInputChange(features_type, input_name, parsed_value) {
@@ -108,7 +109,7 @@ class Calc extends React.Component {
           </div>
         </div>
         <div className={style.creatures}>
-          <Creatures onClick={this.handleCreatureClick}/>
+          <Creatures creature_data={this.creature_data} onClick={this.handleCreatureClick}/>
         </div>
         <div className={style.fight_logs}>
           {this.state.attacking.amount} attacking creatures do {this.state.minimum_damage} - {this.state.maximum_damage} damage.<br/>
