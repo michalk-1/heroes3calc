@@ -62,6 +62,10 @@ export class CreatureData {
     return parseObject(matching[0]);
   }
 
+  hasCreature(name) {
+    return this.by_name.hasOwnProperty(name);
+  }
+
   hasTown(town) {
     return this.by_town.hasOwnProperty(town);
   }

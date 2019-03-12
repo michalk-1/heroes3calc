@@ -9,7 +9,7 @@ export class Creature extends React.Component {
   }
 
   handleClick(ev) {
-    this.props.onClick(this.props.name, this.props.town);
+    this.props.onClick(this.props.name);
   }
 
   render() {

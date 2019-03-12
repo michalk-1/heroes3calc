@@ -30,7 +30,9 @@ export class Features extends React.Component {
       <div>
         <span>{title}: </span>
         <Dropdown value={this.props.values[name]}
-                  onChange={value => this.handleInputChange(name, value)}/>
+                  onChange={value => this.handleInputChange(name, value)}
+                  creature_data={this.props.creature_data}
+        />
       </div>
     );
   }
@@ -40,7 +42,15 @@ export class Features extends React.Component {
     const parsed_value = parseType(name, value, previous_value)
     this.props.onInputChange(this.props.type, name, parsed_value);
     this.setState({[name]: parsed_value});
+    if (name == 'name' && this.props.creature_data.hasCreature(value)) {
+      this.handleCreatureChange(value);
+    }
     return parsed_value;
+  }
+
+  handleCreatureChange(creature_name) {
+    const creature = this.props.creature_data.getCreature({name: creature_name});
+    this.props.onCreatureChange(creature);
   }
 
   handleClick() {

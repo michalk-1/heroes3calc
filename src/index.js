@@ -20,7 +20,7 @@ class Calc extends React.Component {
     const defending = parseObject(Object.assign(init, getCookie('defending')));
     const state_update = stateUpdate(attacking, defending);
     this.state = Object.assign({toggle: 'attacking'}, state_update);
-    this.state.creature_data = new CreatureData(this);
+    this.creature_data = new CreatureData(this);
   }
 
   static emptyForm() {
@@ -63,14 +63,24 @@ class Calc extends React.Component {
     return (
       <div className={style.calc}>
         <div className={style.attacking}>
-          <Features type="attacking" values={this.state.attacking}
-                    active={attacking_active} onInputChange={(...xs) => this.handleInputChange(...xs)}
-                    onClick={type => this.handleFeaturesClick(type)}/>
+          <Features type="attacking"
+                    values={this.state.attacking}
+                    active={attacking_active}
+                    onInputChange={(...xs) => this.handleInputChange(...xs)}
+                    onClick={type => this.handleFeaturesClick(type)}
+                    onCreatureChange={creature => this.handleCreatureClick(creature)}
+                    creature_data={this.creature_data}
+          />
         </div>
         <div className={style.defending}>
-          <Features type="defending" values={this.state.defending}
-                    active={defending_active} onInputChange={(...xs) => this.handleInputChange(...xs)}
-                    onClick={type => this.handleFeaturesClick(type)}/>
+          <Features type="defending"
+                    values={this.state.defending}
+                    active={defending_active}
+                    onInputChange={(...xs) => this.handleInputChange(...xs)}
+                    onClick={type => this.handleFeaturesClick(type)}
+                    onCreatureChange={creature => this.handleCreatureClick(creature)}
+                    creature_data={this.creature_data}
+          />
         </div>
         <div className={style['attack-result']}>
           <h3>{TITLES.attacking}</h3>
@@ -109,7 +119,9 @@ class Calc extends React.Component {
           </div>
         </div>
         <div className={style.creatures}>
-          <Creatures creature_data={this.state.creature_data} onClick={creature => this.handleCreatureClick(creature)}/>
+          <Creatures creature_data={this.creature_data}
+                     onClick={creature => this.handleCreatureClick(creature)}
+          />
         </div>
         <div className={style.fight_logs}>
           {this.state.attacking.amount} attacking creatures do {this.state.minimum_damage} - {this.state.maximum_damage} damage.<br/>
