@@ -30,6 +30,10 @@ class Calc extends React.Component {
     return init
   }
 
+  handleSwap() {
+    this.setState(stateUpdate(this.state.defending, this.state.attacking));
+  }
+
   stateUpdateByType(features, features_type) {
     if (features_type === 'attacking') {
       return stateUpdate(features, this.state.defending);
@@ -72,6 +76,13 @@ class Calc extends React.Component {
                     creature_data={this.creature_data}
           />
         </div>
+        <div className={style.interactions}>
+          <div className={`${style.interaction} ${style.noselect}`}
+               onClick={() => this.handleSwap()}
+          >
+          ⇄
+          </div>
+        </div>
         <div className={style.defending}>
           <Features type="defending"
                     values={this.state.defending}
@@ -96,6 +107,7 @@ class Calc extends React.Component {
             maximum_units_left={this.state.maximum_units_left}
           />
         </div>
+        <div className={style.dummy}></div>
         <div className={style['retaliation-result']}>
           <h3>{TITLES.defending}</h3>
           <RetaliationResult
@@ -123,7 +135,7 @@ class Calc extends React.Component {
                      onClick={creature => this.handleCreatureClick(creature)}
           />
         </div>
-        <div className={style.fight_logs}>
+        <div className={style['fight-logs']}>
           {this.state.attacking.amount} attacking creatures do {this.state.minimum_damage} - {this.state.maximum_damage} damage.<br/>
           {this.state.defending_minimum_losses} - {this.state.defending_maximum_losses} defending creatures perish.<br/>
           {this.state.defending_minimum_units_left} - {this.state.defending_maximum_units_left} defending creatures remain and do

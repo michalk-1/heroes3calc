@@ -1,6 +1,6 @@
 .calc {
   display: grid;
-  grid-gap: 10px;
+  grid-gap: 20px;
 }
 
 .attack-result {
@@ -9,15 +9,20 @@
   margin-top: 0px;
 }
 
-.retaliation-result {
+.dummy {
   grid-row: 1;
   grid-column: 2;
+}
+
+.retaliation-result {
+  grid-row: 1;
+  grid-column: 3;
   margin-top: 0px;
 }
 
 .tips {
   grid-row: 1;
-  grid-column: 3;
+  grid-column: 4;
   margin-top: 0px;
 }
 
@@ -28,26 +33,56 @@
   max-width: 480px;
 }
 
-.defending {
+.interactions {
   grid-row: 2;
   grid-column: 2;
+  position: relative;
+}
+
+.interaction {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  border: 1px solid;
+  background-color: #eee;
+  box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
+              inset -2px -2px 3px rgba(0, 0, 0, .6);
+}
+
+.interaction:hover {
+  cursor: default;
+  background-color: #fff;
+}
+
+.interaction:active {
+    box-shadow: inset -2px -2px 3px rgba(255, 255, 255, .6),
+                inset 2px 2px 3px rgba(0, 0, 0, .6);
+}
+
+.defending {
+  grid-row: 2;
+  grid-column: 3;
   min-width: 300px;
   max-width: 480px;
 }
 
 .creatures {
+  grid-row-start: 2;
+  grid-row-end: 4;
+  grid-column: 4;
   margin-left: 20px;
   margin-right: 20px;
   min-width: 520px;
-  grid-row-start: 2;
-  grid-row-end: 4;
-  grid-column: 3;
 }
 
-.fight_logs {
-  grid-column-start: 1;
-  grid-column-end: 3;
+.fight-logs {
   grid-row: 3;
+  grid-column-start: 1;
+  grid-column-end: 4;
   text-align: center;
 }
 
@@ -85,4 +120,14 @@ h3 {
   padding: 0;
   text-align: center;
   width: 34px;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
 }
