@@ -136,12 +136,10 @@ class Calc extends React.Component {
           />
         </div>
         <div className={style['fight-logs']}>
-          {this.state.attacking.amount} attacking creatures do {this.state.minimum_damage} - {this.state.maximum_damage} damage.<br/>
-          {this.state.defending_minimum_losses} - {this.state.defending_maximum_losses} defending creatures perish.<br/>
-          {this.state.defending_minimum_units_left} - {this.state.defending_maximum_units_left} defending creatures remain and do
-          {' '}{this.state.defending_minimum_damage} - {this.state.defending_maximum_damage} damage.<br/>
-          {this.state.minimum_losses} - {this.state.maximum_losses} attacking creatures perish and
-          {' '}{this.state.minimum_units_left} - {this.state.maximum_units_left} remain.<br/>
+          The {this.state.attacking.name}s do {this.state.average_damage} damage.
+          {' '}{this.state.defending_average_losses} {this.state.defending.name}s perish.<br/>
+          The {this.state.defending.name}s do {this.state.defending_average_damage} damage.
+          {' '}{this.state.average_losses} {this.state.attacking.name}s perish.<br/>
         </div>
       </div>
     );
