@@ -35,6 +35,7 @@ class Calc extends React.Component {
   }
 
   stateUpdateByType(features, features_type) {
+    setCookie(features_type, features);
     if (features_type === 'attacking') {
       return stateUpdate(features, this.state.defending);
     } else {
@@ -51,7 +52,6 @@ class Calc extends React.Component {
   handleCreatureClick(creature) {
     const features_type = this.state.toggle;
     const features = Object.assign({}, this.state[features_type], creature);
-    setCookie(features_type, features);
     let state = this.stateUpdateByType(features, features_type);
     state['toggle'] = toggleClass(features_type);
     this.setState(state);
