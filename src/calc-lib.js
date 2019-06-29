@@ -93,10 +93,9 @@ export function stateUpdate(attacking, defending) {
   const minimum_damage = calcMin(attacking, defending);
   const maximum_damage = calcMax(attacking, defending);
   const average_damage = 0.5 * (minimum_damage + maximum_damage);
-  const defending_total_health = calcTotalHealth(defending);
-  const defending_minimum_losses = calcLosses(defending, minimum_damage)
-  const defending_average_losses = calcLosses(defending, average_damage)
-  const defending_maximum_losses = calcLosses(defending, maximum_damage)
+  const defending_minimum_losses = calcLosses(defending, minimum_damage);
+  const defending_average_losses = calcLosses(defending, average_damage);
+  const defending_maximum_losses = calcLosses(defending, maximum_damage);
   const defending_minimum_units_left = defending.amount - defending_maximum_losses;
   const defending_average_units_left = defending.amount - defending_average_losses;
   const defending_maximum_units_left = defending.amount - defending_minimum_losses;

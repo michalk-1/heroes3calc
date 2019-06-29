@@ -6,15 +6,16 @@
   "scripts": {
     "start": "webpack-dev-server --mode development --open --hot",
     "build-dev": "webpack --mode development && cp src/creature_banks.html app/a/",
-    "build": "webpack --mode production && cp src/creature_banks.html app/a/"
+    "build": "webpack --mode production && cp src/creature_banks.html app/a/",
+    "test": "jest"
   },
   "author": "Michal Kowalik",
   "license": "BSD",
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
+    "@babel/core": "^7.1.6",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
     "css-loader": "^1.0.0",
     "del": "^3.0.0",
     "gulp": "^3.9.1",
@@ -24,7 +25,7 @@
     "jest": "^24.8.0",
     "reactify": "^1.1.1",
     "style-loader": "^0.23.1",
-    "webpack": "^4.21.0",
+    "webpack": "^4.25.1",
     "webpack-cli": "^3.1.2",
     "webpack-dev-server": "^3.1.9"
   },
