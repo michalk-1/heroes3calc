@@ -11,8 +11,9 @@ describe('calcTotalHealth', () => {
   });
 });
 
-const simpleCache = () => ({
-  cache: {
+function simpleCache() {
+  let _length = 0;
+  return {
     create() {
       let store = {};
       return {
@@ -24,61 +25,55 @@ const simpleCache = () => ({
         },
         set(key, value) {
           store[key] = value;
-          // todo: Consider a limited memory case.
+          _length += 1;
         },
         keys() {
           return Object.keys(store);
         }
-        // todo: Add 'size' property.
       };
-    }
-    // todo: Add 'size' method / property.
-  }
-});
-
-function findIdentityKey(cache, arg) {
-  const key = cache.keys().find((x) => deepEqual(x, arg));
-  return key === undefined ? Immutable(arg) : key;
+    },
+    all: {},
+    get length() { return _length; }
+  };
 }
 
-function memoize(fn, name, cacheCreate) {
-  const cache = {0: cacheCreate.cache.create()};
+function findIdentityKey(keys, arg, fnCreate) {
+  const key = keys.find((x) => deepEqual(x, arg));
+  return key === undefined ? fnCreate(arg) : key;
+}
+
+function unaryLookup(cache, fn, arg) {
+  const key = Immutable.isImmutable(arg) ? arg : findIdentityKey(cache.keys(), arg, Immutable);
+  // note: the assumption is that if it's an immutable argument then only compare via identity
+  if (cache.has(key)) {
+    return cache.get(key);
+  } else {
+    const value = fn(arg);
+    cache.set(key, value);
+    return value;
+  }
+}
+
+function memoize(fn, cacheCreate, name) {
+  const caches = cacheCreate.all;
   function fnMemoized(...args) {
     const length = args.length;
-    if (length === 1) {
-      const unaryCache = cache[0];
-      const arg = args[0];
-      const key = Immutable.isImmutable(arg) ? arg : findIdentityKey(unaryCache, arg);
-      // note: the assumption is that if it's an immutable argument then only compare via identity
-      if (unaryCache.has(key)) {
-        return unaryCache.get(key);
-      } else {
-        const value = fn(arg);
-        unaryCache.set(key, value);
-        return value;
-      }
-    } else { // todo: test this branch
-      if (!cache.hasOwnProperty(args.length)) {
-        cache[args.length] = cacheCreate.cache.create();
-      }
-      const multiCache = cache[args.length];
-      const key = findIdentityKey(multiCache, args);
-      // todo: Consider a version where the 2nd+ arguments are considered to be hashable parameters.
-      //       This way we could lookup the entry by these parameters and then lookup the unary case on the arg.
-      if (multiCache.has(key)) {
-        return multiCache.get(key);
-      } else {
-        const value = fn(...args);
-        multiCache.set(key, value);
-        return value;
-      }
+    if (!caches.hasOwnProperty(length)) {
+      caches[length] = cacheCreate.create();
     }
+    let currentCache = caches[length];
+    for (let i = 0; i < length - 1; ++i) {
+      currentCache = unaryLookup(currentCache, () => cacheCreate.create(), args[i]);
+    }
+    const lastArg = length === 0 ? undefined : args[length - 1];
+    return unaryLookup(currentCache, () => fn(...args), lastArg);
   }
   Object.defineProperty(fnMemoized, 'name', {value: name});
+  fnMemoized.cache = cacheCreate;
   return fnMemoized;
 }
 
-const mkImmutable = memoize(Immutable, 'mkImmutable', simpleCache());
+const mkImmutable = memoize(Immutable, simpleCache(), 'mkImmutable');
 
 describe('Immutable', () => {
   let xs = Immutable([1, 2, 3]);
@@ -102,5 +97,30 @@ describe('Immutable', () => {
     expect(elements).toBe(sameElements);
     expect(elements).toBe(alsoElements);
     expect(mkImmutable.name).toEqual('mkImmutable');
+  });
+  it('can cache empty function call', () => {
+    const fn = () => ({});
+    const fnMemoized = memoize(fn, simpleCache());
+    const obj = fnMemoized();
+    expect(fn()).not.toBe(obj);
+    expect(fnMemoized()).toBe(obj);
+  });
+  it('can cache multi argument function call', () => {
+    const fn = (a, b) => ({'a': a, 'b': b});
+    const fnMemoized = memoize(fn, simpleCache());
+    const obj0 = fnMemoized();
+    const obj1 = fnMemoized('a');
+    const obj2 = fnMemoized('a', 'b');
+    expect(fnMemoized()).toBe(obj0);
+    expect(fnMemoized('a')).toBe(obj1);
+    expect(fnMemoized('a', 'b')).toBe(obj2);
+    expect(fnMemoized()).toEqual(fn());
+    expect(fnMemoized('a')).toEqual(fn('a'));
+    expect(fnMemoized('a', 'b')).toEqual(fn('a', 'b'));
+  });
+  it('extra assertions about isImmutable', () => {
+    expect(Immutable.isImmutable(undefined)).toBe(true);
+    expect(Immutable.isImmutable(() => null)).toBe(true);
+    expect(Immutable.isImmutable(Immutable)).toBe(true);
   });
 });
