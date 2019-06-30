@@ -1,45 +1,32 @@
 import Immutable from 'immutable';
 import deepEqual from 'deep-equal';
 
-function generateUUID() { // Public Domain/MIT
-  let d = new Date().getTime();
-  if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
-    d += performance.now(); //use high-precision timer if available
-  }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    let r = (d + Math.random() * 16) % 16 | 0;
-    d = Math.floor(d / 16);
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
-}
-
 function simpleCache() {
   let _length = 0;
   const hasOwnProperty = Object.prototype.hasOwnProperty;
   return {
     create() {
       let store = {};
-      let weakstore = new WeakMap();
+      let objstore = new WeakMap();
+      let objkeys = [];
       return {
         has(key) {
-          return hasIdentity(key) ? weakstore.has(key) : hasOwnProperty.call(store, key);
+          return hasIdentity(key) ? objstore.has(key) : hasOwnProperty.call(store, key);
         },
         get(key) {
-          return hasIdentity(key) ? weakstore.get(key) : store[key];
+          return hasIdentity(key) ? objstore.get(key) : store[key];
         },
         set(key, value) {
           if (hasIdentity(key)) {
-            weakstore.set(key, value);
+            objstore.set(key, value);
+            objkeys.push(key);
           } else {
             store[key] = value;
           }
           _length += 1;
         },
         keys () {
-          return Object.keys(store);
-        },
-        weakKeys() {
-          return Object.keys(weakstore);
+          return Object.keys(store).concat(objkeys);
         }
       };
     },
@@ -49,20 +36,24 @@ function simpleCache() {
 }
 
 function findIdentityKey(keys, arg) {
-  let key = keys.find((x) => isImmutable(x) && deepEqual(x, arg));
-  key = key === undefined ? keys.find((x) => deepEqual(x, arg)) : key;
-  return key === undefined ? arg : key;
+  return keys.find((x) => deepEqual(x, arg));
 }
 
 function unaryLookup(cache, fn, arg) {
-  const key = isImmutable(arg) ? arg : findIdentityKey(cache.weakKeys(), arg)
-  // note: the assumption is that if it's an immutable argument then only compare via identity
-  if (cache.has(key)) {
-      return cache.get(key);
+  if (!isImmutable(arg)) {
+    throw TypeError('Immutable argument ' + String(arg) + ' passed to ' + fn.name + '.');
+  }
+  if (cache.has(arg)) {
+    return cache.get(arg);
   } else {
+    const keyOpt = findIdentityKey(cache.keys(), arg);
+    if (keyOpt !== undefined && cache.has(keyOpt)) {
+      return cache.get(keyOpt);
+    } else {
       const value = fn(arg);
-      cache.set(key, arg, value);
+      cache.set(arg, value);
       return value;
+    }
   }
 }
 
@@ -88,13 +79,7 @@ export function memoize(fn, cacheCreate) {
   return fnMemoized;
 }
 
-export const PMap = memoize(Immutable.Map);
-PMap.set = memoize((map, key, value) => map.set(key, value));
-
-export const PList = memoize(Immutable.List);
-PList.push = memoize((list, x) => list.push(x));
-
-export function hasIdentity(x) {
+function hasIdentity(x) {
   return typeof x === 'object' || typeof x === 'function';
 }
 
@@ -109,3 +94,11 @@ export function isImmutable(x) {
     Object.is(x, null)
   );
 }
+
+const makeMap = memoize(Immutable.Map);
+export const PMap = (map) => makeMap(Immutable.Map(map));
+PMap.set = memoize((map, key, value) => map.set(key, value));
+
+const makeList = memoize(Immutable.List);
+export const PList = (list) => makeList(Immutable.List(list));
+PList.push = memoize((list, x) => list.push(x));

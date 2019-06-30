@@ -3,9 +3,8 @@ import Immutable from 'immutable';
 import deepEqual from 'deep-equal';
 
 test('deepEqual compares deep structure', () => {
-  expect(deepEqual([1, 2], [1, 2])).toBe(true);
-  expect([1, 2, 3]).toEqual(Immutable.List([1, 2, 3]));  // TODO: even this does not work
-  expect(deepEqual(Immutable.List([1, 2]), [1, 2])).toBe(false);  // TODO: reimplement deepEqual
+  expect(Immutable.List([1, 2])).toEqual(Immutable.List([1, 2]));
+  expect(deepEqual(Immutable.List([1, 2]), Immutable.List([1, 2]))).toBe(true);
 });
 
 describe('Immutable', () => {
@@ -16,8 +15,8 @@ describe('Immutable', () => {
     expect(Immutable.Map({a: 2})['a']).toBe(undefined);
   });
   it('can use referential transparency for hashtable lookup', () => {
-    let obj1 = [1, 2, 3];
-    let obj2 = [1, 2, 3];
+    let obj1 = Immutable.List([1, 2, 3]);
+    let obj2 = Immutable.List([1, 2, 3]);
     let elements = PList(obj1);
     let elementsPlus = PList.push(elements, 4);
     let elementsPlus2 = PList.push(elements, 4);
@@ -25,10 +24,10 @@ describe('Immutable', () => {
 
     expect(elements).toEqual(sameElements);
     expect(elements).toEqual(Immutable.List([1, 2, 3]));
-    expect(PList.name).toEqual(Immutable.List.name);
+    expect(PList.name).toEqual("PList");
     expect(elementsPlus).toEqual(elements.push(4));
-    expect(elementsPlus).toBe(elementsPlus2);  // todo: should be same thing
-    expect(elements).toBe(sameElements);  // todo: must cast mutable arguments to immutable ones
+    expect(elementsPlus).toBe(elementsPlus2);
+    expect(elements).toBe(sameElements);
   });
   it('can cache empty function call', () => {
     const fn = () => ({});
@@ -73,9 +72,12 @@ describe('Immutable', () => {
     expect(isImmutable(Immutable.Map())).toBe(true);
   });
   it('uses deep equal to find a key', () => {
-    const obj1 = PMap({obj: 1});
+    const obj1a = PMap({obj: 1});
+    const obj1b = PMap({obj: 1});
     const obj2 = PMap({obj: 2});
-    expect(obj1).not.toBe(obj2);
-    expect(obj1).not.toEqual(obj2);
+
+    expect(obj1a).not.toBe(obj2);
+    expect(obj1a).not.toEqual(obj2);
+    expect(obj1a).toBe(obj1b);
   });
 });
