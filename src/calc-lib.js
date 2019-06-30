@@ -1,9 +1,15 @@
 import { REGEX_NUMBER } from './util.js';
+import { memoize, Immutable, isImmutable } from './immutable-lib.js';
 
 function verifyIsNumber(obj, name) {
   if (!REGEX_NUMBER.test(obj[name])) {
     throw TypeError(name + " is not a number (" + String(obj[name]) + ").");
   }
+}
+
+function verifyIsImmutable(obj, name) {
+  if (!isImmutable(obj))
+    throw TypeError("Expected an immutable object in '" + name + "'.");
 }
 
 function nonNegative(value) {
@@ -14,17 +20,21 @@ function nanToZero(value) {
   return Number.isNaN(value) ? 0 : value;
 }
 
-export function calcLosses(army, damage) {
-  verifyIsNumber({damage: damage}, 'damage');
+export function calcTotalHealth(army)
+{
   verifyIsNumber(army, 'amount');
   verifyIsNumber(army, 'health');
-  army = {
-    amount: Number(army.amount),
-    health: Number(army.health),
-  };
-  damage = Number(damage);
-  const total_health = calcTotalHealth(army);
-  const remaining = Math.ceil(nonNegative((total_health - damage) / army.health));
+  army = Immutable.set(army, 'amount', Number(army.amount));
+  army = Immutable.set(army, 'health', Number(army.health));
+  return Immutable.set(army, 'total_health', nanToZero(army.amount * army.health));
+}
+
+export function calcLosses(army, damage_string) {
+  verifyIsNumber({damage: damage_string}, 'damage');
+  verifyIsImmutable(army, 'calcLosses.army');
+  const damage = Number(damage_string);
+  army = calcTotalHealth(army);
+  const remaining = Math.ceil(nonNegative((army.total_health - damage) / army.health));
   const losses = army.amount - remaining;
   return nanToZero(losses);
 }
@@ -75,18 +85,6 @@ function calcDamage(attacking, defending, base_damage_name)
   result *= mod;
   result *= 1 - defending_damage_reduction / 100;
   return nanToZero(Math.round(result));
-}
-
-export function calcTotalHealth(defending)
-{
-  verifyIsNumber(defending, 'amount');
-  verifyIsNumber(defending, 'health');
-  defending = {
-    amount: Number(defending.amount),
-    health: Number(defending.health),
-  };
-  const result = defending.health * defending.amount;
-  return nanToZero(result);
 }
 
 export function stateUpdate(attacking, defending) {
