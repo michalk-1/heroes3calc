@@ -19,21 +19,27 @@ function simpleCache() {
   return {
     create() {
       let store = {};
-      let argstore = {};
+      let weakstore = new WeakMap();
       return {
         has(key) {
-          return hasOwnProperty.call(store, key);
+          return hasIdentity(key) ? weakstore.has(key) : hasOwnProperty.call(store, key);
         },
         get(key) {
-          return store[key];
+          return hasIdentity(key) ? weakstore.get(key) : store[key];
         },
-        set(key, arg, value) {
-          store[key] = value;
-          argstore[key] = arg;
+        set(key, value) {
+          if (hasIdentity(key)) {
+            weakstore.set(key, value);
+          } else {
+            store[key] = value;
+          }
           _length += 1;
         },
-        keys() {
-          return Object.keys(store).map((x) => [x, argstore[x]]);
+        keys () {
+          return Object.keys(store);
+        },
+        weakKeys() {
+          return Object.keys(weakstore);
         }
       };
     },
@@ -43,13 +49,13 @@ function simpleCache() {
 }
 
 function findIdentityKey(keys, arg) {
-  const pair = keys.find((p) => p[1] === arg || deepEqual(p[1], arg));  // p : pair of (key, arg)
-  // TODO: skip the find if the arg is immutable and the UUID can be saved with the object
-  return pair === undefined ? generateUUID() : pair[0];
+  let key = keys.find((x) => isImmutable(x) && deepEqual(x, arg));
+  key = key === undefined ? keys.find((x) => deepEqual(x, arg)) : key;
+  return key === undefined ? arg : key;
 }
 
 function unaryLookup(cache, fn, arg) {
-  const key = findIdentityKey(cache.keys(), arg);
+  const key = isImmutable(arg) ? arg : findIdentityKey(cache.weakKeys(), arg)
   // note: the assumption is that if it's an immutable argument then only compare via identity
   if (cache.has(key)) {
       return cache.get(key);
@@ -83,7 +89,23 @@ export function memoize(fn, cacheCreate) {
 }
 
 export const PMap = memoize(Immutable.Map);
-PMap.set = memoize(Immutable.Map.prototype.set.call);
+PMap.set = memoize((map, key, value) => map.set(key, value));
 
 export const PList = memoize(Immutable.List);
-PList.push = memoize(Immutable.List.prototype.push.call);
+PList.push = memoize((list, x) => list.push(x));
+
+export function hasIdentity(x) {
+  return typeof x === 'object' || typeof x === 'function';
+}
+
+export function isImmutable(x) {
+  if (Immutable.isImmutable(x)) return true;
+  return (
+    typeof x === 'number' ||
+    typeof x === 'string' ||
+    typeof x === 'boolean' ||
+    typeof x === 'function' ||
+    Object.is(x, undefined) ||
+    Object.is(x, null)
+  );
+}

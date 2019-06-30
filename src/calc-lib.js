@@ -1,9 +1,9 @@
 import { REGEX_NUMBER } from './util.js';
-import { memoize, Immutable, isImmutable } from './immutable-lib.js';
+import { memoize, PMap, isImmutable } from './immutable-lib.js';
 
-function verifyIsNumber(obj, name) {
-  if (!REGEX_NUMBER.test(obj[name])) {
-    throw TypeError(name + " is not a number (" + String(obj[name]) + ").");
+function verifyIsNumber(value, name) {
+  if (!REGEX_NUMBER.test(value)) {
+    throw TypeError(name + " is not a number (" + String(value) + ").");
   }
 }
 
@@ -22,11 +22,15 @@ function nanToZero(value) {
 
 export function calcTotalHealth(army)
 {
-  verifyIsNumber(army, 'amount');
-  verifyIsNumber(army, 'health');
-  army = Immutable.set(army, 'amount', Number(army.amount));
-  army = Immutable.set(army, 'health', Number(army.health));
-  return Immutable.set(army, 'total_health', nanToZero(army.amount * army.health));
+  let amount = army.get('amount');
+  let health = army.get('health');
+  verifyIsNumber(amount, 'amount');
+  verifyIsNumber(health, 'health');
+  amount = Number(amount);
+  health = Number(health);
+  army = PMap.set(army, 'amount', amount);
+  army = PMap.set(army, 'health', health);
+  return PMap.set(army, 'total_health', nanToZero(amount * health));
 }
 
 export function calcLosses(army, damage_string) {

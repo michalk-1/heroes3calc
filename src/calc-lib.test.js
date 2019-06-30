@@ -5,9 +5,9 @@ describe('calcTotalHealth', () => {
   it('multiplies health by amount', () => {
     const army = PMap({health: 3, amount: 4});
     const result = calcTotalHealth(army);
-    expect(result.health).toEqual(3);
-    expect(result.amount).toEqual(4);
-    expect(result.total_health).toEqual(12);
+    expect(result.get('health')).toEqual(3);
+    expect(result.get('amount')).toEqual(4);
+    expect(result.get('total_health')).toEqual(12);
   });
   it('throws a TypeError if provided with NaN', () => {
     const army_nan = PMap({health: NaN, amount: NaN});
@@ -16,11 +16,11 @@ describe('calcTotalHealth', () => {
   it('accepts numbers as strings and parses them', () => {
     const army = PMap({health: '3', amount: '4'});
     const result = calcTotalHealth(army);
-    expect(result.health).not.toEqual('3');
-    expect(result.amount).not.toEqual('4');
-    expect(result.health).toEqual(3);
-    expect(result.amount).toEqual(4);
-    expect(result.total_health).toEqual(12);
+    expect(result.get('health')).not.toEqual('3');
+    expect(result.get('amount')).not.toEqual('4');
+    expect(result.get('health')).toEqual(3);
+    expect(result.get('amount')).toEqual(4);
+    expect(result.get('total_health')).toEqual(12);
   });
 });
 
