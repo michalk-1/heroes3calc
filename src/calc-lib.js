@@ -2,7 +2,7 @@ import { REGEX_NUMBER } from './util.js';
 import { memoize, PMap, isImmutable } from './immutable-lib.js';
 
 function verifyIsNumber(value, name) {
-  if (!REGEX_NUMBER.test(value)) {
+  if (!(typeof value === 'number') && !REGEX_NUMBER.test(value)) {
     throw TypeError(name + " is not a number (" + String(value) + ").");
   }
 }
@@ -32,16 +32,21 @@ export function calcTotalHealth(army)
   army = PMap.set(army, 'health', health);
   return PMap.set(army, 'total_health', nanToZero(amount * health));
 }
+calcTotalHealth = memoize(calcTotalHealth);
 
-export function calcLosses(army, damage_string) {
-  verifyIsNumber({damage: damage_string}, 'damage');
+export function calcLosses(army, damage) {
+  verifyIsNumber(damage, 'calcLosses.damage');
   verifyIsImmutable(army, 'calcLosses.army');
-  const damage = Number(damage_string);
+  damage = Number(damage);
   army = calcTotalHealth(army);
-  const remaining = Math.ceil(nonNegative((army.total_health - damage) / army.health));
-  const losses = army.amount - remaining;
-  return nanToZero(losses);
+  const total_health = army.get('total_health');
+  const health = army.get('health');
+  const amount = army.get('amount');
+  const remaining = Math.ceil(nonNegative((total_health - damage) / health));
+  const losses = amount - remaining;
+  return army.set('losses', nanToZero(losses));
 }
+calcLosses = calcLosses(calcTotalHealth);
 
 function modifier(attack, defense) {
   if (attack > defense) {
