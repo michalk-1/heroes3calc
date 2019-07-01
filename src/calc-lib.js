@@ -1,18 +1,24 @@
-import { REGEX_NUMBER } from './util.js';
-import { memoize, PMap, isImmutable } from './immutable-lib.js';
+import {REGEX_NUMBER} from './util.js';
+import {memoize, PMap} from './immutable-lib.js';
+import {Map} from 'immutable';
+
+function extractNumber(map, name) {
+  return verifyIsNumber(map.get(name), name);
+}
 
 function verifyIsNumber(value, name) {
   if (!(typeof value === 'number') && !REGEX_NUMBER.test(value)) {
     throw TypeError(name + " is not a number (" + String(value) + ").");
   }
+  return Number(value);
 }
 
-function verifyIsImmutable(obj, name) {
-  if (!isImmutable(obj))
-    throw TypeError("Expected an immutable object in '" + name + "'.");
+function verify(obj, name, pred) {
+  if (!pred(obj))
+    throw TypeError("Assertion " + pred.name + " failed for '" + name + "'.");
 }
 
-function nonNegative(value) {
+function saturateToZero(value) {
   return value < 0 ? 0 : value;
 }
 
@@ -20,33 +26,44 @@ function nanToZero(value) {
   return Number.isNaN(value) ? 0 : value;
 }
 
-export function calcTotalHealth(army)
-{
-  let amount = army.get('amount');
-  let health = army.get('health');
-  verifyIsNumber(amount, 'amount');
-  verifyIsNumber(health, 'health');
-  amount = Number(amount);
-  health = Number(health);
-  army = PMap.set(army, 'amount', amount);
-  army = PMap.set(army, 'health', health);
-  return PMap.set(army, 'total_health', nanToZero(amount * health));
+export function calcTotalHealth(army) {
+  verify(army, 'calcTotalHealth.army', Map.isMap);
+  const amount = extractNumber(army, 'amount');
+  const health = extractNumber(army, 'health');
+  const total_health = nanToZero(amount * health);
+  return army.set('total_health', total_health);
 }
 calcTotalHealth = memoize(calcTotalHealth);
 
-export function calcLosses(army, damage) {
-  verifyIsNumber(damage, 'calcLosses.damage');
-  verifyIsImmutable(army, 'calcLosses.army');
-  damage = Number(damage);
-  army = calcTotalHealth(army);
-  const total_health = army.get('total_health');
-  const health = army.get('health');
-  const amount = army.get('amount');
-  const remaining = Math.ceil(nonNegative((total_health - damage) / health));
-  const losses = amount - remaining;
-  return army.set('losses', nanToZero(losses));
+function calcAverage(data) {
+  return data.set('average', 0.5 * (data.get('minimum') + data.get('maximum')));
 }
-calcLosses = calcLosses(calcTotalHealth);
+
+export function calcLosses(army, damage) {
+  verify(army, 'calcLosses.army', Map.isMap);
+  verify(damage, 'calcLosses.damages', Map.isMap);
+  const amount = army.get('amount');
+  const health = army.get('health');
+  const total_health = army.get('total_health');
+
+  let losses = damage.map(damage => {
+    const lost = amount - Math.ceil(saturateToZero((total_health - damage) / health));
+    return nanToZero(lost);
+  });
+
+  let remaining = losses.map(lost => amount - lost);
+  remaining = remaining.withMutations(x => {
+    x.set('minimum', remaining.get('maximum'));
+    x.set('maximum', remaining.get('minimum'));
+  });
+
+  return army.withMutations(army => {
+    army.set('total_health', total_health);
+    army.set('losses', losses);
+    army.set('remaining', remaining);
+  });
+}
+calcLosses = memoize(calcLosses);
 
 function modifier(attack, defense) {
   if (attack > defense) {
@@ -70,20 +87,13 @@ export function calcMax(attacking, defending)
 
 function calcDamage(attacking, defending, base_damage_name)
 {
-  verifyIsNumber(attacking, 'additional_attack');
-  verifyIsNumber(attacking, 'attack');
-  verifyIsNumber(attacking, 'amount');
-  verifyIsNumber(attacking, base_damage_name);
-  verifyIsNumber(defending, 'additional_defense');
-  verifyIsNumber(defending, 'defense');
-  verifyIsNumber(defending, 'damage_reduction');
-  const attacking_attack = Number(attacking.attack);
-  const attacking_additional_attack = Number(attacking.additional_attack);
-  const attacking_amount = Number(attacking.amount);
-  const attacking_base_damage = Number(attacking[base_damage_name]);
-  const defending_defense = Number(defending.defense);
-  const defending_additional_defense = Number(defending.additional_defense);
-  const defending_damage_reduction = Number(defending.damage_reduction);
+  const attacking_additional_attack = extractNumber(attacking, 'additional_attack');
+  const attacking_attack = extractNumber(attacking, 'attack');
+  const attacking_amount = extractNumber(attacking, 'amount');
+  const attacking_base_damage = extractNumber(attacking, base_damage_name);
+  const defending_additional_defense = extractNumber(defending, 'additional_defense');
+  const defending_defense = extractNumber(defending, 'defense');
+  const defending_damage_reduction = extractNumber(defending, 'damage_reduction');
 
   let mod = 1 + modifier(attacking_attack + attacking_additional_attack,
                          defending_defense + defending_additional_defense);
@@ -97,44 +107,45 @@ function calcDamage(attacking, defending, base_damage_name)
 }
 
 export function stateUpdate(attacking, defending) {
-  const minimum_damage = calcMin(attacking, defending);
-  const maximum_damage = calcMax(attacking, defending);
-  const average_damage = 0.5 * (minimum_damage + maximum_damage);
-  const defending_minimum_losses = calcLosses(defending, minimum_damage);
-  const defending_average_losses = calcLosses(defending, average_damage);
-  const defending_maximum_losses = calcLosses(defending, maximum_damage);
-  const defending_minimum_units_left = defending.amount - defending_maximum_losses;
-  const defending_average_units_left = defending.amount - defending_average_losses;
-  const defending_maximum_units_left = defending.amount - defending_minimum_losses;
-  const defending_minimum_damage = calcMin(Object.assign({}, defending, {amount: defending_minimum_units_left}), attacking);
-  const defending_maximum_damage = calcMax(Object.assign({}, defending, {amount: defending_maximum_units_left}), attacking);
-  const defending_average_damage = 0.5 * (defending_minimum_damage + defending_maximum_damage);
-  const minimum_losses = calcLosses(attacking, defending_minimum_damage);
-  const average_losses = calcLosses(attacking, defending_average_damage);
-  const maximum_losses = calcLosses(attacking, defending_maximum_damage);
-  const minimum_units_left = attacking.amount - maximum_losses;
-  const average_units_left = attacking.amount - average_losses;
-  const maximum_units_left = attacking.amount - minimum_losses;
+  attacking = PMap(attacking);  // TODO: remove
+  defending = PMap(defending);  // TODO: remove
+
+  attacking = attacking.set('damage', calcAverage(PMap({
+    minimum: calcMin(attacking, defending),
+    maximum: calcMax(attacking, defending),
+  })));
+
+  defending = calcTotalHealth(defending);
+  defending = calcLosses(defending, attacking.get('damage'));
+
+  defending = defending.set('damage', calcAverage(PMap({
+    minimum: calcMin(defending.set('amount', defending.getIn(['remaining', 'minimum'])), attacking),
+    maximum: calcMax(defending.set('amount', defending.getIn(['remaining', 'maximum'])), attacking),
+  })));
+
+  attacking = calcTotalHealth(attacking);
+  attacking = calcLosses(attacking, defending.get('damage'));
+
   return {
     attacking: attacking,
+    minimum_damage: attacking.getIn(['damage', 'minimum']),
+    average_damage: attacking.getIn(['damage', 'average']),
+    maximum_damage: attacking.getIn(['damage', 'maximum']),
+    minimum_losses: attacking.getIn(['losses', 'minimum']),
+    average_losses: attacking.getIn(['losses', 'average']),
+    maximum_losses: attacking.getIn(['losses', 'maximum']),
+    minimum_units_left: attacking.getIn(['remaining', 'minimum']),
+    average_units_left: attacking.getIn(['remaining', 'average']),
+    maximum_units_left: attacking.getIn(['remaining', 'maximum']),
     defending: defending,
-    minimum_damage: minimum_damage,
-    average_damage: average_damage,
-    maximum_damage: maximum_damage,
-    minimum_losses: minimum_losses,
-    average_losses: average_losses,
-    maximum_losses: maximum_losses,
-    minimum_units_left: minimum_units_left,
-    average_units_left: average_units_left,
-    maximum_units_left: maximum_units_left,
-    defending_minimum_damage: defending_minimum_damage,
-    defending_average_damage: defending_average_damage,
-    defending_maximum_damage: defending_maximum_damage,
-    defending_minimum_losses: defending_minimum_losses,
-    defending_average_losses: defending_average_losses,
-    defending_maximum_losses: defending_maximum_losses,
-    defending_minimum_units_left: defending_minimum_units_left,
-    defending_average_units_left: defending_average_units_left,
-    defending_maximum_units_left: defending_maximum_units_left,
+    defending_minimum_damage: defending.getIn(['damage', 'minimum']),
+    defending_average_damage: defending.getIn(['damage', 'average']),
+    defending_maximum_damage: defending.getIn(['damage', 'maximum']),
+    defending_minimum_losses: defending.getIn(['losses', 'minimum']),
+    defending_average_losses: defending.getIn(['losses', 'average']),
+    defending_maximum_losses: defending.getIn(['losses', 'maximum']),
+    defending_minimum_units_left: defending.getIn(['remaining', 'minimum']),
+    defending_average_units_left: defending.getIn(['remaining', 'average']),
+    defending_maximum_units_left: defending.getIn(['remaining', 'maximum']),
   };
 }

@@ -26,14 +26,31 @@ describe('calcTotalHealth', () => {
 });
 
 describe('calcLosses', () => {
+  const damage = PMap({
+    minimum: 3,
+    maximum: 6,
+  });
+
   it('calculates losses', () => {
-    const army = PMap({health: '3', amount: '4'});
-    const result = calcLosses(army, '3');
-    expect(result.get('losses')).toEqual(1);
+    const army = PMap({health: 3, amount: 4, total_health: 12});
+    const result = calcLosses(army, damage);
+    const minimum_losses = result.getIn(['losses', 'minimum']);
+    const maximum_losses = result.getIn(['losses', 'maximum']);
+    const minimum_remain = result.getIn(['remaining', 'minimum']);
+    const maximum_remain = result.getIn(['remaining', 'maximum']);
+
+    expect(minimum_losses).toEqual(1);
+    expect(maximum_remain).toEqual(3);
+
+    expect(minimum_remain).toEqual(2);
+    expect(maximum_losses).toEqual(2);
   });
   it('calculates losses returns zero on NaN', () => {
     const army = PMap({health: NaN, amount: NaN});
-    const result = calcLosses(army, NaN);
-    expect(result.get('losses')).toEqual(0);
+    const result = calcLosses(army, damage);
+    const minimum_losses = result.getIn(['losses', 'minimum']);
+    const maximum_losses = result.getIn(['losses', 'maximum']);
+    expect(minimum_losses).toEqual(0);
+    expect(maximum_losses).toEqual(0);
   });
 });
