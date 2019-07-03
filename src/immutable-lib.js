@@ -36,7 +36,7 @@ function simpleCache() {
 }
 
 function findIdentityKey(keys, arg) {
-  return keys.find((x) => deepEqual(x, arg));
+  return keys.find(x => Immutable.is(x, arg));
 }
 
 function unaryLookup(cache, fn, arg) {

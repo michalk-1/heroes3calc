@@ -5,14 +5,20 @@ import deepEqual from 'deep-equal';
 test('deepEqual compares deep structure', () => {
   const xs_1 = Immutable.List([1, 2]);
   const xs_2 = Immutable.List([1, 2]);
+  const mut1 = [1, 2];
+  const mut2 = [1, 2];
+
   expect(xs_1).not.toBe(xs_2);
   expect(xs_1).toEqual(xs_2);
   expect(deepEqual(xs_1, xs_2)).toBe(true);
   expect(Immutable.is(xs_1, xs_2)).toBe(true);
   expect(Immutable.is(xs_1, xs_2)).toBe(true);
-  expect(deepEqual([1], [1])).toBe(true);
-  expect(Immutable.is([1], [1])).toBe(false);  // not true, but not an error either
-  expect(Immutable.is("1", "1")).toBe(true);
+
+  expect(deepEqual(mut1, mut2)).toBe(true);
+  expect(Immutable.is(mut1, mut2)).toBe(false);  // not true and not an error either
+  expect(Immutable.is("1, 2", "1, 2")).toBe(true);
+
+  expect(deepEqual(xs_1, mut1)).toBe(false);  // not true
 });
 
 describe('Immutable', () => {

@@ -1,52 +1,50 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import style from './Calc.css';
-import { AttackResult } from './components/AttackResult/index.js';
-import { RetaliationResult } from './components/RetaliationResult/index.js';
-import { CalcInput } from './components/CalcInput/index.js';
-import { stateUpdate } from './calc-lib.js';
-import { CreatureData, Creatures } from './components/Creatures/index.js';
-import { Features } from './components/Features/index.js';
-import { Dropdown } from './components/Dropdown/index.js';
-import { getCookie, setCookie } from './cookie-lib.js';
-import { NUMBER_NAMES, STRING_NAMES, TITLES } from './data.js';
-import { parseObject, toggleClass } from  './util.js';
-import {emptyForm} from "./app-lib";
+import {AttackResult} from './components/AttackResult/index.js';
+import {RetaliationResult} from './components/RetaliationResult/index.js';
+import {CreatureData, Creatures} from './components/Creatures/index.js';
+import {Features} from './components/Features/index.js';
+import {TITLES} from './data.js';
+import {emptyForm, stateUpdate} from "./app-lib";
 
 class Calc extends React.Component {
   constructor(props) {
     super(props);
-    const attacking = emptyForm();
-    const defending = emptyForm();
-    const state_update = stateUpdate(attacking, defending);
-    this.state = Object.assign({toggle: 'attacking'}, state_update);
     this.creature_data = new CreatureData(this);
+    this.state = Object.assign(
+      {toggle: 'attacking'},
+      stateUpdate(emptyForm(), emptyForm())
+    );
   }
 
   handleSwap() {
-    this.setState(stateUpdate(this.state.defending, this.state.attacking));
+    const attacking = this.state.attacking;
+    const defending = this.state.defending;
+    this.setState(stateUpdate(defending, attacking));
   }
 
-  stateUpdateByType(features, features_type) {
+  dispatchStateUpdate(features, features_type) {
     if (features_type === 'attacking') {
-      return stateUpdate(features, this.state.defending);
+      const defending = this.state.defending;
+      return stateUpdate(features, defending);
     } else {
-      return stateUpdate(this.state.attacking, features);
+      const attacking = this.state.attacking;
+      return stateUpdate(attacking, features);
     }
   }
 
+  // features_type: {attacking,defending}
   handleInputChange(features_type, input_name, parsed_value) {
     let features = this.state[features_type];
-    features[input_name] = parsed_value;
-    this.setState(this.stateUpdateByType(features, features_type));
+    features = features.set(input_name, parsed_value);
+    this.setState(this.dispatchStateUpdate(features, features_type));
   }
 
   handleCreatureClick(creature) {
     const features_type = this.state.toggle;
-    const features = Object.assign({}, this.state[features_type], creature);
-    let state = this.stateUpdateByType(features, features_type);
-    state['toggle'] = toggleClass(features_type);
-    this.setState(state);
+    const features = this.state[features_type].merge(creature);
+    this.setState(this.dispatchStateUpdate(features, features_type));
   }
 
   handleFeaturesClick(type) {
@@ -56,11 +54,19 @@ class Calc extends React.Component {
   render() {
     const attacking_active = this.state.toggle === 'attacking';
     const defending_active = this.state.toggle === 'defending';
+    const attacking = this.state.attacking;
+    const attacking_name = attacking.get('name');
+    const attacking_damage_average = attacking.getIn(['damage', 'average']);
+    const attacking_losses_average = attacking.getIn(['losses', 'average']);
+    const defending = this.state.defending;
+    const defending_name = defending.get('name');
+    const defending_damage_average = defending.getIn(['damage', 'average']);
+    const defending_losses_average = defending.getIn(['losses', 'average']);
     return (
       <div className={style.calc}>
         <div className={style.attacking}>
           <Features type="attacking"
-                    values={this.state.attacking}
+                    values={attacking}
                     active={attacking_active}
                     onInputChange={(...xs) => this.handleInputChange(...xs)}
                     onClick={type => this.handleFeaturesClick(type)}
@@ -77,7 +83,7 @@ class Calc extends React.Component {
         </div>
         <div className={style.defending}>
           <Features type="defending"
-                    values={this.state.defending}
+                    values={defending}
                     active={defending_active}
                     onInputChange={(...xs) => this.handleInputChange(...xs)}
                     onClick={type => this.handleFeaturesClick(type)}
@@ -87,32 +93,12 @@ class Calc extends React.Component {
         </div>
         <div className={style['attack-result']}>
           <h3>{TITLES.attacking}</h3>
-          <AttackResult
-            minimum_damage={this.state.minimum_damage}
-            average_damage={this.state.average_damage}
-            maximum_damage={this.state.maximum_damage}
-            minimum_losses={this.state.minimum_losses}
-            average_losses={this.state.average_losses}
-            maximum_losses={this.state.maximum_losses}
-            minimum_units_left={this.state.minimum_units_left}
-            average_units_left={this.state.average_units_left}
-            maximum_units_left={this.state.maximum_units_left}
-          />
+          <AttackResult attacking={attacking}/>
         </div>
         <div className={style.dummy}></div>
         <div className={style['retaliation-result']}>
           <h3>{TITLES.defending}</h3>
-          <RetaliationResult
-            minimum_damage={this.state.defending_minimum_damage}
-            average_damage={this.state.defending_average_damage}
-            maximum_damage={this.state.defending_maximum_damage}
-            minimum_losses={this.state.defending_minimum_losses}
-            average_losses={this.state.defending_average_losses}
-            maximum_losses={this.state.defending_maximum_losses}
-            minimum_units_left={this.state.defending_minimum_units_left}
-            average_units_left={this.state.defending_average_units_left}
-            maximum_units_left={this.state.defending_maximum_units_left}
-          />
+          <RetaliationResult defending={defending} />
         </div>
         <div className='tips'>
           <h3>Tips</h3>
@@ -128,10 +114,10 @@ class Calc extends React.Component {
           />
         </div>
         <div className={style['fight-logs']}>
-          The {this.state.attacking.name}s do {this.state.average_damage} damage.
-          {' '}{this.state.defending_average_losses} {this.state.defending.name}s perish.<br/>
-          The {this.state.defending.name}s do {this.state.defending_average_damage} damage.
-          {' '}{this.state.average_losses} {this.state.attacking.name}s perish.<br/>
+          The {attacking_name}s do {attacking_damage_average} damage.
+          {' '}{defending_losses_average} {defending_name}s perish.<br/>
+          The {defending_name}s do {defending_damage_average} damage.
+          {' '}{attacking_losses_average} {attacking_name}s perish.<br/>
         </div>
       </div>
     );
