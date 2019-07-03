@@ -4,11 +4,11 @@ import style from './Dropdown.css';
 
 
 function sortStates(a, b, value) {
-  const aLower = a.name.toLowerCase()
-  const bLower = b.name.toLowerCase()
-  const valueLower = value.toLowerCase()
-  const queryPosA = aLower.indexOf(valueLower)
-  const queryPosB = bLower.indexOf(valueLower)
+  const aLower = a.name.toLowerCase();
+  const bLower = b.name.toLowerCase();
+  const valueLower = value.toLowerCase();
+  const queryPosA = aLower.indexOf(valueLower);
+  const queryPosB = bLower.indexOf(valueLower);
   if (queryPosA !== queryPosB) {
     return queryPosA - queryPosB
   }

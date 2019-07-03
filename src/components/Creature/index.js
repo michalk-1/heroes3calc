@@ -8,7 +8,7 @@ export class Creature extends React.Component {
     this.image = this.props.image;
   }
 
-  handleClick(ev) {
+  handleClick() {
     this.props.onClick(this.props.name);
   }
 

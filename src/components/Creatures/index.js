@@ -55,7 +55,7 @@ export class CreatureData {
       x => x.name === name
     );
 
-    if (matching.length != 1) {
+    if (matching.length !== 1) {
       return {};
     }
 
@@ -127,4 +127,4 @@ export class Creatures extends React.Component {
       </div>
     );
   }
-};
+}

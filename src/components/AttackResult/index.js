@@ -1,46 +1,23 @@
 import React from 'react';
 import style from './AttackResult.css';
 
-export function formatResult(props) {
-    const losses = props.minimum_losses === props.maximum_losses ?
-      <span>{props.minimum_losses}</span> : (
-      <span>
-        {props.minimum_losses} {' '}-{' '} {props.maximum_losses}
-        {' '}(avg {props.average_losses})
-      </span>
-    );
-    const damage = props.minimum_damage === props.maximum_damage ?
-      <span>{props.minimum_damage}</span> : (
-      <span>
-        {props.minimum_damage} {' '}-{' '} {props.maximum_damage}
-        {' '}(avg {props.average_damage})
-      </span>
-    );
-    const remaining = (
-      props.minimum_units_left === props.maximum_units_left ?
-      <span>{props.minimum_units_left}</span> : (
-      <span>
-        {props.minimum_units_left} {' '}-{' '}
-        {props.maximum_units_left} {' '}
-        (avg {props.average_units_left})
-      </span>
-    ));
-    return {
-      losses: losses,
-      damage: damage,
-      remaining: remaining,
-    }
+export function formatResult(props, name) {
+  const prop = props.get(name);
+  const minimum_prop = prop.get('minimum');
+  const average_prop = prop.get('average');
+  const maximum_prop = prop.get('maximum');
+  return minimum_prop === maximum_prop ?
+    <span>{minimum_prop}</span> : (
+    <span>{minimum_prop}{' '}-{' '}{maximum_prop}{' '}(avg {average_prop})</span>
+  );
 }
 
-export class AttackResult extends React.Component {
-  render() {
-    const result = formatResult(this.props);
-    return (
-      <div className={style['attack-result']}>
-        <p>Damage:{' '}{result.damage}</p>
-        <p>Losses:{' '}{result.losses}</p>
-        <p>Remaining:{' '}{result.remaining}</p>
-      </div>
-    );
-  }
+export function AttackResult(props) {
+  return (
+    <div className={style['attack-result']}>
+      <p>Damage:{' '}{formatResult(props, 'damage')}</p>
+      <p>Losses:{' '}{formatResult(props, 'losses')}</p>
+      <p>Remaining:{' '}{formatResult(props, 'remaining')}</p>
+    </div>
+  );
 }

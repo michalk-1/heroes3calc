@@ -1,5 +1,5 @@
 import React from 'react';
-import { NAMES, NUMBER_NAMES, TITLES } from './../../data.js';
+import { NAMES, TITLES } from './../../data.js';
 import style from './Features.css';
 import { CalcInput } from '../CalcInput/index.js';
 import { parseType } from  './../../util.js';
@@ -39,10 +39,10 @@ export class Features extends React.Component {
 
   handleInputChange(name, value) {
     const previous_value = this.state[name];
-    const parsed_value = parseType(name, value, previous_value)
+    const parsed_value = parseType(name, value, previous_value);
     this.props.onInputChange(this.props.type, name, parsed_value);
     this.setState({[name]: parsed_value});
-    if (name == 'name' && this.props.creature_data.hasCreature(value)) {
+    if (name === 'name' && this.props.creature_data.hasCreature(value)) {
       this.handleCreatureChange(value);
     }
     return parsed_value;

@@ -1,16 +1,13 @@
 import React from 'react';
 import style from './RetaliationResult.css';
-import { formatResult } from '../AttackResult/index.js';
+import {formatResult} from "../AttackResult";
 
-export class RetaliationResult extends React.Component {
-  render() {
-    const result = formatResult(this.props);
-    return (
-      <div className={style['retaliation-result']}>
-        <p>Losses:{' '}{result.losses}</p>
-        <p>Damage:{' '}{result.damage}</p>
-        <p>Remaining:{' '}{result.remaining}</p>
-      </div>
-    );
-  }
+export function RetaliationResult(props) {
+  return (
+    <div className={style['retaliation-result']}>
+      <p>Losses:{' '}{formatResult(props, 'losses')}</p>
+      <p>Damage:{' '}{formatResult(props, 'damage')}</p>
+      <p>Remaining:{' '}{formatResult(props, 'remaining')}</p>
+    </div>
+  );
 }
