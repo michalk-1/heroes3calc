@@ -11,23 +11,16 @@ import { Dropdown } from './components/Dropdown/index.js';
 import { getCookie, setCookie } from './cookie-lib.js';
 import { NUMBER_NAMES, STRING_NAMES, TITLES } from './data.js';
 import { parseObject, toggleClass } from  './util.js';
+import {emptyForm} from "./app-lib";
 
 class Calc extends React.Component {
   constructor(props) {
     super(props);
-    const init = Calc.emptyForm();
-    const attacking = parseObject(Object.assign(init, getCookie('attacking')));
-    const defending = parseObject(Object.assign(init, getCookie('defending')));
+    const attacking = emptyForm();
+    const defending = emptyForm();
     const state_update = stateUpdate(attacking, defending);
     this.state = Object.assign({toggle: 'attacking'}, state_update);
     this.creature_data = new CreatureData(this);
-  }
-
-  static emptyForm() {
-    let init = Object.assign(...NUMBER_NAMES.map(x => ({[x]: 0})));
-    init.amount = 1;
-    init = Object.assign(...STRING_NAMES.map(x => ({[x]: ''})), init);
-    return init
   }
 
   handleSwap() {
@@ -35,7 +28,6 @@ class Calc extends React.Component {
   }
 
   stateUpdateByType(features, features_type) {
-    setCookie(features_type, features);
     if (features_type === 'attacking') {
       return stateUpdate(features, this.state.defending);
     } else {
