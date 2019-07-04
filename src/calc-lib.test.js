@@ -16,9 +16,8 @@ describe('calcTotalHealth', () => {
   });
   it('accepts numbers as strings and parses them', () => {
     const army = PMap({health: '3', amount: '4'});
+    expect(army.get('health')).toEqual('3');
     const result = calcTotalHealth(army);
-    expect(result.get('health')).not.toEqual('3');
-    expect(result.get('amount')).not.toEqual('4');
     expect(result.get('health')).toEqual(3);
     expect(result.get('amount')).toEqual(4);
     expect(result.get('total_health')).toEqual(12);

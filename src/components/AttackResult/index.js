@@ -1,8 +1,8 @@
 import React from 'react';
 import style from './AttackResult.css';
 
-export function formatResult(props, name) {
-  const prop = props.get(name);
+export function formatResult(features, name) {
+  const prop = features.get(name);
   const minimum_prop = prop.get('minimum');
   const average_prop = prop.get('average');
   const maximum_prop = prop.get('maximum');
@@ -13,11 +13,12 @@ export function formatResult(props, name) {
 }
 
 export function AttackResult(props) {
+  const attacking = props.attacking;
   return (
     <div className={style['attack-result']}>
-      <p>Damage:{' '}{formatResult(props, 'damage')}</p>
-      <p>Losses:{' '}{formatResult(props, 'losses')}</p>
-      <p>Remaining:{' '}{formatResult(props, 'remaining')}</p>
+      <p>Damage:{' '}{formatResult(attacking, 'damage')}</p>
+      <p>Losses:{' '}{formatResult(attacking, 'losses')}</p>
+      <p>Remaining:{' '}{formatResult(attacking, 'remaining')}</p>
     </div>
   );
 }

@@ -7,6 +7,8 @@ import {CreatureData, Creatures} from './components/Creatures/index.js';
 import {Features} from './components/Features/index.js';
 import {TITLES} from './data.js';
 import {emptyForm, stateUpdate} from "./app-lib";
+import {gSimpleCaches} from "./immutable-lib";
+
 
 class Calc extends React.Component {
   constructor(props) {

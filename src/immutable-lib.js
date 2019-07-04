@@ -1,10 +1,11 @@
 import Immutable from 'immutable';
-import deepEqual from 'deep-equal';
+
+export let gSimpleCaches = [];
 
 function simpleCache() {
-  let _length = 0;
   const hasOwnProperty = Object.prototype.hasOwnProperty;
-  return {
+  let _length = 0;
+  const cache = {
     create() {
       let store = {};
       let objstore = new WeakMap();
@@ -33,6 +34,8 @@ function simpleCache() {
     all: {},
     get length() { return _length; }
   };
+  gSimpleCaches.push(cache);
+  return cache;
 }
 
 function findIdentityKey(keys, arg) {

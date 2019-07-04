@@ -1,5 +1,4 @@
 import {REGEX_NUMBER} from './util.js';
-import {memoize, PMap} from './immutable-lib.js';
 import {Map} from 'immutable';
 
 function extractNumber(map, name) {
@@ -13,7 +12,7 @@ function verifyIsNumber(value, name) {
   return Number(value);
 }
 
-function verify(obj, name, pred) {
+export function verify(obj, name, pred) {
   if (!pred(obj))
     throw TypeError("Assertion " + pred.name + " failed for '" + name + "'.");
 }
@@ -31,11 +30,14 @@ export function calcTotalHealth(army) {
   const amount = extractNumber(army, 'amount');
   const health = extractNumber(army, 'health');
   const total_health = nanToZero(amount * health);
-  return army.set('total_health', total_health);
+  return army.withMutations(army => {
+    army.set('amount', amount);
+    army.set('health', health);
+    army.set('total_health', total_health);
+  });
 }
-calcTotalHealth = memoize(calcTotalHealth);
 
-function calcAverage(data) {
+export function calcAverage(data) {
   return data.set('average', 0.5 * (data.get('minimum') + data.get('maximum')));
 }
 
@@ -64,7 +66,6 @@ export function calcLosses(army, damage) {
     // TODO: calculate health: lost & remaining health (not totals)
   });
 }
-calcLosses = memoize(calcLosses);
 
 function modifier(attack, defense) {
   if (attack > defense) {
