@@ -1,6 +1,9 @@
 import Immutable from 'immutable';
 
-export let gSimpleCaches = [];
+export const gSimpleCaches = [];
+export const gCacheMisses = {};
+export const gCacheHits = {};
+export const gCacheLongHits = {};
 
 function simpleCache() {
   const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -31,7 +34,7 @@ function simpleCache() {
         }
       };
     },
-    all: {},
+    all: {},  // caches by number of arguments that the function was called with
     get length() { return _length; }
   };
   gSimpleCaches.push(cache);
@@ -42,19 +45,22 @@ function findIdentityKey(keys, arg) {
   return keys.find(x => Immutable.is(x, arg));
 }
 
-function unaryLookup(cache, fn, arg) {
+function unaryLookup(cache, fn, arg, name) {
   if (!isImmutable(arg)) {
     throw TypeError('Immutable argument ' + String(arg) + ' passed to ' + fn.name + '.');
   }
   if (cache.has(arg)) {
+    if (name !== undefined) gCacheHits[name] += 1;
     return cache.get(arg);
   } else {
     const keyOpt = findIdentityKey(cache.keys(), arg);
     if (keyOpt !== undefined && cache.has(keyOpt)) {
+      if (name !== undefined) gCacheLongHits[name] += 1;
       return cache.get(keyOpt);
     } else {
       const value = fn(arg);
       cache.set(arg, value);
+      if (name !== undefined) gCacheMisses[name] += 1;
       return value;
     }
   }
@@ -75,8 +81,11 @@ export function memoize(fn, cacheCreate) {
       currentCache = unaryLookup(currentCache, () => cacheCreate.create(), args[i]);
     }
     const lastArg = length === 0 ? undefined : args[length - 1];
-    return unaryLookup(currentCache, () => fn(...args), lastArg);
+    return unaryLookup(currentCache, () => fn(...args), lastArg, fn.name);
   }
+  gCacheHits[fn.name] = 0;
+  gCacheLongHits[fn.name] = 0;
+  gCacheMisses[fn.name] = 0;
   Object.defineProperty(fnMemoized, 'name', {value: fn.name});
   fnMemoized.cache = cacheCreate;
   return fnMemoized;

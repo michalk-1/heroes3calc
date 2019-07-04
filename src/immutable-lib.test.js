@@ -19,6 +19,9 @@ test('deepEqual compares deep structure', () => {
   expect(Immutable.is("1, 2", "1, 2")).toBe(true);
 
   expect(deepEqual(xs_1, mut1)).toBe(false);  // not true
+
+
+  expect(xs_1).toBe(Immutable.List(xs_1));
 });
 
 describe('Immutable', () => {
@@ -32,15 +35,14 @@ describe('Immutable', () => {
     let obj1 = Immutable.List([1, 2, 3]);
     let obj2 = Immutable.List([1, 2, 3]);
     let elements = PList(obj1);
-    let elementsPlus = PList.push(elements, 4);
-    let elementsPlus2 = PList.push(elements, 4);
+    let elementsPlus = elements.push(4);
     let sameElements = PList(obj2);
 
     expect(elements).toEqual(sameElements);
     expect(elements).toEqual(Immutable.List([1, 2, 3]));
     expect(PList.name).toEqual("PList");
     expect(elementsPlus).toEqual(elements.push(4));
-    expect(elementsPlus).toBe(elementsPlus2);
+    expect(elementsPlus).not.toBe(elements.push(4));
     expect(elements).toBe(sameElements);
   });
   it('can cache empty function call', () => {
