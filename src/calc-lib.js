@@ -1,5 +1,4 @@
 import {REGEX_NUMBER} from './util.js';
-import {Map} from 'immutable';
 
 function extractNumber(map, name) {
   return verifyIsNumber(map.get(name), name);
@@ -26,7 +25,6 @@ function nanToZero(value) {
 }
 
 export function calcTotalHealth(army) {
-  verify(army, 'calcTotalHealth.army', Map.isMap);
   const amount = extractNumber(army, 'amount');
   const health = extractNumber(army, 'health');
   const total_health = nanToZero(amount * health);
@@ -42,8 +40,6 @@ export function calcAverage(data) {
 }
 
 export function calcLosses(army, damage) {
-  verify(army, 'calcLosses.army', Map.isMap);
-  verify(damage, 'calcLosses.damages', Map.isMap);
   const amount = army.get('amount');
   const health = army.get('health');
   const total_health = army.get('total_health');

@@ -13,8 +13,8 @@ emptyForm = memoize(emptyForm);
 
 
 export function stateUpdate(attacking, defending) {
-  verify(attacking, 'stateUpdate.attacking', Map.isMap);
-  verify(defending, 'stateUpdate.defending', Map.isMap);
+  // verify(attacking, 'stateUpdate.attacking', Map.isMap);
+  // verify(defending, 'stateUpdate.defending', Map.isMap);
 
   attacking = attacking.set('damage', calcAverage(PMap({
     minimum: calcMin(attacking, defending),

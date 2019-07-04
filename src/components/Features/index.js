@@ -18,7 +18,7 @@ export class Features extends React.Component {
     return (
       <div>
         <span>{title}: </span>
-        <CalcInput value={this.props.values[name]}
+        <CalcInput value={this.props.values.get(name)}
                    onChange={value => this.handleInputChange(name, value)}/>
       </div>
     );
@@ -29,7 +29,7 @@ export class Features extends React.Component {
     return (
       <div>
         <span>{title}: </span>
-        <Dropdown value={this.props.values[name]}
+        <Dropdown value={this.props.values.get(name)}
                   onChange={value => this.handleInputChange(name, value)}
                   creature_data={this.props.creature_data}
         />
