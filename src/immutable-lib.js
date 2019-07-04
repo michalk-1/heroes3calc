@@ -100,8 +100,6 @@ export function isImmutable(x) {
 
 const makeMap = memoize(Immutable.Map);
 export const PMap = (map) => makeMap(Immutable.Map(map));
-PMap.set = memoize((map, key, value) => map.set(key, value));
 
 const makeList = memoize(Immutable.List);
 export const PList = (list) => makeList(Immutable.List(list));
-PList.push = memoize((list, x) => list.push(x));

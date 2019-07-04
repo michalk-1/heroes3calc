@@ -8,7 +8,7 @@ import {Features} from './components/Features/index.js';
 import {TITLES} from './data.js';
 import {emptyForm, stateUpdate} from "./app-lib";
 import {gSimpleCaches} from "./immutable-lib";
-
+window.gSimpleCaches = gSimpleCaches;
 
 class Calc extends React.Component {
   constructor(props) {
