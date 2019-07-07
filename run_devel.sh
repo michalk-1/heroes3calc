@@ -17,8 +17,14 @@ __dir="$(cd "$(dirname "${BASH_SOURCE[${__b3bp_tmp_source_idx:-0}]}")" && pwd)"
 __file="${__dir}/$(basename "${BASH_SOURCE[${__b3bp_tmp_source_idx:-0}]}")"
 __base="$(basename "${__file}" .sh)"
 
+function browse() {
+    sleep 2
+    sensible-browser "http://localhost:5000"
+}
+
 export FLASK_APP=app
 export FLASK_ENV=development
 npm run build-dev
+browse &
 cd ${__dir}
 flask run

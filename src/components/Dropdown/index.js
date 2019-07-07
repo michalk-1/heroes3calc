@@ -4,8 +4,10 @@ import style from './Dropdown.css';
 
 
 function sortStates(a, b, value) {
-  const aLower = a.name.toLowerCase();
-  const bLower = b.name.toLowerCase();
+  const aName = a.get('name');
+  const bName = b.get('name');
+  const aLower = aName.toLowerCase();
+  const bLower = bName.toLowerCase();
   const valueLower = value.toLowerCase();
   const queryPosA = aLower.indexOf(valueLower);
   const queryPosB = bLower.indexOf(valueLower);
@@ -16,12 +18,24 @@ function sortStates(a, b, value) {
 }
 
 function matchStateToTerm(state, value) {
+  const name = state.get('name');
+  return name.toLowerCase().indexOf(value.toLowerCase()) !== -1;
+}
+
+function renderItem(item, isHighlighted) {
+  const name = item.get('name');
+  const abbr = item.get('abbr');
   return (
-    state.name.toLowerCase().indexOf(value.toLowerCase()) !== -1
-  )
+    <div className={`${style.item} ${isHighlighted ? style.highlighted : ''}`}
+         key={abbr}
+    >
+      {name}
+    </div>
+  );
 }
 
 export class Dropdown extends Component {
+
 
   render() {
     return (
@@ -31,7 +45,7 @@ export class Dropdown extends Component {
           inputProps={{ id: 'states-autocomplete' }}
           wrapperStyle={{ display: 'block' }}
           items={Object.values(this.props.creature_data.by_name)}
-          getItemValue={(item) => item.name}
+          getItemValue={(item) => item.get('name')}
           shouldItemRender={matchStateToTerm}
           sortItems={sortStates}
           onChange={(ev, value) => this.props.onChange(value)}
@@ -41,12 +55,7 @@ export class Dropdown extends Component {
               {children}
             </div>
           )}
-          renderItem={(item, isHighlighted) => (
-            <div
-              className={`${style.item} ${isHighlighted ? style.highlighted : ''}`}
-              key={item.abbr}
-            >{item.name}</div>
-          )}
+          renderItem={renderItem}
         />
       </div>
     );

@@ -2,23 +2,26 @@ import React from 'react';
 import style from './Creatures.css';
 import { Creature } from '../Creature/index.js';
 import { TOWNS, SKELETON, SKELETON_WARRIOR } from '../../data.js';
-import { parseObject } from '../../util.js';
+import { PMap } from "../../immutable-lib";
 
 export class CreatureData {
   constructor(owner) {
-    this.by_town = {[SKELETON['town']]: [SKELETON, SKELETON_WARRIOR]};
-    this.by_name = {[SKELETON['name']]: SKELETON,
-                    [SKELETON_WARRIOR['name']]: SKELETON_WARRIOR};
+    const skeleton = PMap(SKELETON);
+    const skeleton_warrior = PMap(SKELETON_WARRIOR);
+    this.by_town = {[SKELETON['town']]: [skeleton, skeleton_warrior]};
+    this.by_name = {[SKELETON['name']]: skeleton,
+                    [SKELETON_WARRIOR['name']]: skeleton_warrior};
     let that = this;
-    TOWNS.forEach(function(town){
+    TOWNS.forEach(town => {
       const uri = window.location.origin + '/d/list_of_creatures?town=' + town;
       fetch(uri)
         .then(response => response.json())
         .then(
           (json_response) => {
-            const data = json_response['uri'];
-            that.by_town[town] = data;
-            data.forEach(function(creature) {
+            const list_of_objects = json_response['uri'];
+            const list_of_pmaps = list_of_objects.map(x => PMap(x));
+            that.by_town[town] = list_of_pmaps;
+            list_of_pmaps.forEach(creature => {
               that.by_name[creature.name] = creature;
             });
             owner.forceUpdate();
@@ -51,15 +54,15 @@ export class CreatureData {
       return {};
     }
 
-    const matching = this.by_town[town].filter(
-      x => x.name === name
+    const result_opt = this.by_town[town].find(
+      x => x.get('name') === name
     );
 
-    if (matching.length !== 1) {
+    if (result_opt === undefined) {
       return {};
     }
 
-    return parseObject(matching[0]);
+    return result_opt;
   }
 
   hasCreature(name) {
@@ -82,21 +85,25 @@ export class Creatures extends React.Component {
     this.creature_data = this.props.creature_data;
   }
 
-  handleCreatureClick(creature_name) {
-    const creature = this.creature_data.getCreature({name: creature_name});
+  handleCreatureClick(name) {
+    const creature = this.creature_data.getCreature({name: name});
     this.props.onClick(creature);
   }
 
   getCreaturesFromTown(town) {
     if (!this.creature_data.hasTown(town)) {
-      return <div></div>
+      return <div></div>;
     }
 
-    const creatures = this.creature_data.getTown(town).map(record => (
-      <Creature key={record.name} name={record.name} image={record.image}
-                town={town} onClick={name => this.handleCreatureClick(name)}/>
-    ));
-    return <div>{creatures}</div>
+    const creatures = this.creature_data.getTown(town).map(record => {
+      const name = record.get('name');
+      const image = record.get('image');
+      return (
+        <Creature key={name} name={name} image={image} town={town}
+                  onClick={name => this.handleCreatureClick(name)}/>
+      );
+    });
+    return <div>{creatures}</div>;
   }
 
   render() {
