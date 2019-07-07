@@ -7,7 +7,7 @@ import {CreatureData, Creatures} from './components/Creatures/index.js';
 import {Features} from './components/Features/index.js';
 import {TITLES} from './data.js';
 import {emptyForm, stateUpdate} from "./app-lib";
-import {gSimpleCaches, gCacheMisses, gCacheLongHits, gCacheHits} from "./immutable-lib";
+import {gSimpleCaches, gCacheMisses, gCacheLongHits, gCacheHits, PMap} from "./immutable-lib";
 window.gSimpleCaches = gSimpleCaches;
 window.gCacheMisses = gCacheMisses;
 window.gCacheHits = gCacheHits;
@@ -48,7 +48,7 @@ class Calc extends React.Component {
 
   handleCreatureClick(creature) {
     const features_type = this.state.toggle;
-    const features = this.state[features_type].merge(creature);
+    const features = PMap.merge(this.state[features_type], creature);
     this.setState(this.dispatchStateUpdate(features, features_type));
   }
 

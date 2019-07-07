@@ -107,8 +107,13 @@ export function isImmutable(x) {
   );
 }
 
+function merge(a, b) {
+  return a.merge(b);
+}
+
 const makeMap = memoize(Immutable.Map);
-export const PMap = (map) => makeMap(Immutable.Map(map));
+export let PMap = (map) => makeMap(Immutable.Map(map));
+PMap.merge = memoize(merge);
 
 const makeList = memoize(Immutable.List);
 export const PList = (list) => makeList(Immutable.List(list));
