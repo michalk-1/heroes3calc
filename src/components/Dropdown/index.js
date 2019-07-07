@@ -24,10 +24,10 @@ function matchStateToTerm(state, value) {
 
 function renderItem(item, isHighlighted) {
   const name = item.get('name');
-  const abbr = item.get('abbr');
+  const key = name.replace(' ', '_');
   return (
     <div className={`${style.item} ${isHighlighted ? style.highlighted : ''}`}
-         key={abbr}
+         key={key}
     >
       {name}
     </div>
@@ -38,14 +38,15 @@ export class Dropdown extends Component {
 
 
   render() {
+    const values = Object.values(this.props.creature_data.by_name);
     return (
       <div>
         <Autocomplete
           value={this.props.value}
           inputProps={{ id: 'states-autocomplete' }}
           wrapperStyle={{ display: 'block' }}
-          items={Object.values(this.props.creature_data.by_name)}
-          getItemValue={(item) => item.get('name')}
+          items={values}
+          getItemValue={item => item.get('name')}
           shouldItemRender={matchStateToTerm}
           sortItems={sortStates}
           onChange={(ev, value) => this.props.onChange(value)}

@@ -19,7 +19,7 @@ __base="$(basename "${__file}" .sh)"
 
 function browse() {
     sleep 2
-    sensible-browser "http://localhost:5000"
+    firefox "http://localhost:5000"
 }
 
 export FLASK_APP=app

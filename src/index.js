@@ -8,10 +8,12 @@ import {Features} from './components/Features/index.js';
 import {TITLES} from './data.js';
 import {emptyForm, stateUpdate} from "./app-lib";
 import {gSimpleCaches, gCacheMisses, gCacheLongHits, gCacheHits, PMap} from "./immutable-lib";
+import Immutable from 'immutable';
 window.gSimpleCaches = gSimpleCaches;
 window.gCacheMisses = gCacheMisses;
 window.gCacheHits = gCacheHits;
 window.gCacheLongHits = gCacheLongHits;
+window.Immutable = Immutable;
 
 class Calc extends React.Component {
   constructor(props) {
@@ -21,6 +23,8 @@ class Calc extends React.Component {
       {toggle: 'attacking'},
       stateUpdate(emptyForm(), emptyForm())
     );
+    window.gState = this.state;
+    window.gCreatures = this.creature_data;
   }
 
   handleSwap() {

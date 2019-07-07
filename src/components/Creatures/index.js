@@ -22,7 +22,7 @@ export class CreatureData {
             const list_of_pmaps = list_of_objects.map(x => PMap(x));
             that.by_town[town] = list_of_pmaps;
             list_of_pmaps.forEach(creature => {
-              that.by_name[creature.name] = creature;
+              that.by_name[creature.get('name')] = creature;
             });
             owner.forceUpdate();
           },
