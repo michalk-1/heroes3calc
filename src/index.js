@@ -6,14 +6,19 @@ import {RetaliationResult} from './components/RetaliationResult/index.js';
 import {CreatureData, Creatures} from './components/Creatures/index.js';
 import {Features} from './components/Features/index.js';
 import {TITLES} from './data.js';
-import {emptyForm, stateUpdate} from "./app-lib";
-import {gSimpleCaches, gCacheMisses, gCacheLongHits, gCacheHits, PMap} from "./immutable-lib";
+import applib from "./app-lib";
+import {memoize, gSimpleCaches, gCacheSize, gCacheMisses, gCacheLongHits, gCacheHits} from "./immutable-lib";
 import Immutable from 'immutable';
+
 window.gSimpleCaches = gSimpleCaches;
 window.gCacheMisses = gCacheMisses;
 window.gCacheHits = gCacheHits;
 window.gCacheLongHits = gCacheLongHits;
+window.gCacheSize = gCacheSize;
 window.Immutable = Immutable;
+const emptyForm = memoize(applib.emptyForm);
+const stateUpdate = memoize(applib.stateUpdate);
+const merge = memoize(applib.merge);
 
 class Calc extends React.Component {
   constructor(props) {
@@ -52,7 +57,7 @@ class Calc extends React.Component {
 
   handleCreatureClick(creature) {
     const features_type = this.state.toggle;
-    const features = PMap.merge(this.state[features_type], creature);
+    const features = merge(this.state[features_type], creature);
     this.setState(this.dispatchStateUpdate(features, features_type));
   }
 
@@ -127,6 +132,18 @@ class Calc extends React.Component {
           {' '}{defending_losses_average} {defending_name}s perish.<br/>
           The {defending_name}s do {defending_damage_average} damage.
           {' '}{attacking_losses_average} {attacking_name}s perish.<br/>
+          <table>
+            <tbody>
+              <tr><td>Cache Size:</td>
+                  <td>{gCacheSize()}</td></tr>
+              <tr><td>Cache Hits:</td>
+                  <td>{gCacheHits['stateUpdate']}</td></tr>
+              <tr><td>Cache Long Hits:</td>
+                  <td>{gCacheLongHits['stateUpdate']}</td></tr>
+              <tr><td>Cache Misses:</td>
+                  <td>{gCacheMisses['stateUpdate']}</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     );

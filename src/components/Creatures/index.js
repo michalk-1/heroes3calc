@@ -2,12 +2,15 @@ import React from 'react';
 import style from './Creatures.css';
 import { Creature } from '../Creature/index.js';
 import { TOWNS, SKELETON, SKELETON_WARRIOR } from '../../data.js';
-import { PMap } from "../../immutable-lib";
+import Immutable from 'immutable';
+import { memoize } from "../../immutable-lib";
+
+const Map = memoize(Immutable.Map);
 
 export class CreatureData {
   constructor(owner) {
-    const skeleton = PMap(SKELETON);
-    const skeleton_warrior = PMap(SKELETON_WARRIOR);
+    const skeleton = Map(SKELETON);
+    const skeleton_warrior = Map(SKELETON_WARRIOR);
     this.by_town = {[SKELETON['town']]: [skeleton, skeleton_warrior]};
     this.by_name = {[SKELETON['name']]: skeleton,
                     [SKELETON_WARRIOR['name']]: skeleton_warrior};
@@ -19,9 +22,9 @@ export class CreatureData {
         .then(
           (json_response) => {
             const list_of_objects = json_response['uri'];
-            const list_of_pmaps = list_of_objects.map(x => PMap(x));
-            that.by_town[town] = list_of_pmaps;
-            list_of_pmaps.forEach(creature => {
+            const list_of_maps = list_of_objects.map(x => Map(x));
+            that.by_town[town] = list_of_maps;
+            list_of_maps.forEach(creature => {
               that.by_name[creature.get('name')] = creature;
             });
             owner.forceUpdate();

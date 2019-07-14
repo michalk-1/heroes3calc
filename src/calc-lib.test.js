@@ -1,8 +1,12 @@
 import {calcLosses, calcTotalHealth} from './calc-lib.js';
-import {PMap} from './immutable-lib.js';
+import Immutable from 'immutable';
+import {memoize} from './immutable-lib.js';
+
+
 
 describe('calcTotalHealth', () => {
   it('multiplies health by amount', () => {
+    const PMap = memoize(Immutable.Map);
     const army = PMap({health: 3, amount: 4});
     const result = calcTotalHealth(army);
     expect(result.get('health')).toEqual(3);
@@ -10,11 +14,13 @@ describe('calcTotalHealth', () => {
     expect(result.get('total_health')).toEqual(12);
   });
   it('Returns zero if provided with NaN', () => {
+    const PMap = memoize(Immutable.Map);
     const army = PMap({health: NaN, amount: NaN});
     const result = calcTotalHealth(army);
     expect(result.get('total_health')).toEqual(0);
   });
   it('accepts numbers as strings and parses them', () => {
+    const PMap = memoize(Immutable.Map);
     const army = PMap({health: '3', amount: '4'});
     expect(army.get('health')).toEqual('3');
     const result = calcTotalHealth(army);
@@ -25,6 +31,7 @@ describe('calcTotalHealth', () => {
 });
 
 describe('calcLosses', () => {
+  const PMap = memoize(Immutable.Map);
   const damage = PMap({
     minimum: 3,
     maximum: 6,

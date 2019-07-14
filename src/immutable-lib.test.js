@@ -1,6 +1,9 @@
-import {memoize, PList, PMap, isImmutable} from './immutable-lib.js';
+import {memoize, isImmutable} from './immutable-lib.js';
 import Immutable from 'immutable';
 import deepEqual from 'deep-equal';
+
+const PList = memoize(Immutable.List);
+const PMap = memoize(Immutable.Map);
 
 test('deepEqual compares deep structure', () => {
   const xs_1 = Immutable.List([1, 2]);
@@ -40,7 +43,7 @@ describe('Immutable', () => {
 
     expect(elements).toEqual(sameElements);
     expect(elements).toEqual(Immutable.List([1, 2, 3]));
-    expect(PList.name).toEqual("PList");
+    expect(PList.name).toEqual("List");
     expect(elementsPlus).toEqual(elements.push(4));
     expect(elementsPlus).not.toBe(elements.push(4));
     expect(elements).toBe(sameElements);

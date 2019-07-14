@@ -1,4 +1,6 @@
-import { NUMBER_NAMES } from  './data.js';
+import {NUMBER_NAMES} from './data.js';
+import Immutable from 'immutable';
+
 
 export const REGEX_NUMBER = /^\+?(0*)((0|[1-9]\d*)(\.\d*)?)$/;
 
@@ -8,6 +10,33 @@ export function parseType(name, value, previous_value) {
   } else {
     return value;
   }
+}
+
+export function console_log(...args)  {
+  console.log(...args);
+}
+
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+export function str(mapping) {
+  let object = mapping;
+  if (Immutable.isMap(mapping)) {
+    console.log('Immutable!');
+    object = mapping.toJS();
+  }
+  if (typeof object === "object") {
+    for (let key of Object.keys(object)) {
+      let value = object[key];
+      if (typeof value === 'object' && value !== null && hasOwnProperty.call(object, 'image')) {
+        delete object.image;
+      }
+    }
+    if (hasOwnProperty.call(object, 'image')) {
+      delete object.image;
+    }
+    return JSON.stringify(object);
+  }
+  return String(object);
 }
 
 function parseNumber(name, value, previous_value) {

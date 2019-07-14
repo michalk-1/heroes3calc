@@ -1,37 +1,44 @@
 import Immutable from 'immutable';
+import {console_log, str} from "./util";
+import deepEqual from "deep-equal";
 
 export const gSimpleCaches = [];
 export const gCacheMisses = {};
 export const gCacheHits = {};
 export const gCacheLongHits = {};
+export const gCacheSize = () => gSimpleCaches.map(x => x.length).reduce((a, x) => a + x);
+
+// Creates a function that memoizes the result of func. If resolver is provided, it determines the cache key for storing
+// the result based on the arguments provided to the memoized function. By default, the first argument provided to the
+// memoized function is used as the map cache key. The func is invoked with the this binding of the memoized function.
+//
+// Note: The cache is exposed as the cache property on the memoized function. Its creation may be customized by
+// replacing the _.memoize.Cache constructor with one whose instances implement the Map method interface of clear,
+// delete, get, has, and set.
 
 function simpleCache() {
-  const hasOwnProperty = Object.prototype.hasOwnProperty;
   let _length = 0;
   const cache = {
     create() {
-      let store = {};
-      let objstore = new WeakMap();
-      let objkeys = [];
+      let store = new Map();
       return {
         has(key) {
-          return hasIdentity(key) ? objstore.has(key) : hasOwnProperty.call(store, key);
+          return store.has(key);
         },
         get(key) {
-          return hasIdentity(key) ? objstore.get(key) : store[key];
+          return store.get(key);
         },
         set(key, value) {
-          if (hasIdentity(key)) {
-            objstore.set(key, value);
-            objkeys.push(key);
-          } else {
-            store[key] = value;
-          }
+          store.set(key, value);
           _length += 1;
         },
-        keys () {
-          return Object.keys(store).concat(objkeys);
-        }
+        delete(key)  {
+          _length -= 1;
+          store.delete(key);
+        },
+        keys() {
+          return store.keys();
+        },
       };
     },
     all: {},  // caches by number of arguments that the function was called with
@@ -42,26 +49,52 @@ function simpleCache() {
 }
 
 function findIdentityKey(keys, arg) {
-  return keys.find(x => Immutable.is(x, arg));
+  for (let k of keys) {
+    if (Immutable.isImmutable(k) && Immutable.isImmutable(arg)) {
+      if (Immutable.is(k, arg))
+        return k;
+    } else if (deepEqual(k, arg)) {
+      return k;
+    }
+  }
+  return undefined;
 }
 
 function unaryLookup(cache, fn, arg, name) {
-  if (!isImmutable(arg)) {
-    throw TypeError('Immutable argument ' + String(arg) + ' passed to ' + fn.name + '.');
-  }
   if (cache.has(arg)) {
-    if (name !== undefined) gCacheHits[name] += 1;
-    return cache.get(arg);
+    const result = cache.get(arg);
+    if (name !== undefined) {
+      gCacheHits[name] += 1;
+      console_log('Found key:', str(arg), '====', str(result), 'for "' + name + '.');
+    } else {
+      console_log('Found key:', str(arg), '====', str(result), 'for "?".');
+    }
+    return result;
   } else {
     const keyOpt = findIdentityKey(cache.keys(), arg);
     if (keyOpt !== undefined && cache.has(keyOpt)) {
-      if (name !== undefined) gCacheLongHits[name] += 1;
-      return cache.get(keyOpt);
+      const result = cache.get(keyOpt);
+      if (isImmutable(arg)) {
+        cache.delete(keyOpt);
+        cache.set(arg, result);
+      }
+      if (name !== undefined) {
+        gCacheLongHits[name] += 1;
+        console_log('Found by search ', str(arg), '====', str(result), 'for "' + str(name) + '".');
+      } else {
+        console_log('Found by search ', str(arg), '====', str(result), 'for "?".');
+      }
+      return result;
     } else {
-      const value = fn(arg);
-      cache.set(arg, value);
-      if (name !== undefined) gCacheMisses[name] += 1;
-      return value;
+      const result = fn(arg);
+      cache.set(arg, result);
+      if (name !== undefined) {
+        gCacheMisses[name] += 1;
+        console_log('Did not find', str(arg), '====', str(result), 'for "' + str(name) + '".');
+      } else {
+        console_log('Did not find', str(arg), '====', str(result), 'for "?".');
+      }
+      return result;
     }
   }
 }
@@ -91,7 +124,7 @@ export function memoize(fn, cacheCreate) {
   return fnMemoized;
 }
 
-function hasIdentity(x) {
+export function hasIdentity(x) {
   return typeof x === 'object' || typeof x === 'function';
 }
 
@@ -106,14 +139,3 @@ export function isImmutable(x) {
     Object.is(x, null)
   );
 }
-
-function merge(a, b) {
-  return a.merge(b);
-}
-
-const makeMap = memoize(Immutable.Map);
-export let PMap = (map) => makeMap(Immutable.Map(map));
-PMap.merge = memoize(merge);
-
-const makeList = memoize(Immutable.List);
-export const PList = (list) => makeList(Immutable.List(list));
