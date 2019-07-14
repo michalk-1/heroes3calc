@@ -7,14 +7,13 @@ import {CreatureData, Creatures} from './components/Creatures/index.js';
 import {Features} from './components/Features/index.js';
 import {TITLES} from './data.js';
 import applib from "./app-lib";
-import {memoize, gSimpleCaches, gCacheSize, gCacheMisses, gCacheLongHits, gCacheHits} from "./immutable-lib";
+import {memoize, gSimpleCaches, gCacheMisses, gCacheLongHits, gCacheHits} from "./immutable-lib";
 import Immutable from 'immutable';
 
 window.gSimpleCaches = gSimpleCaches;
-window.gCacheMisses = gCacheMisses;
-window.gCacheHits = gCacheHits;
-window.gCacheLongHits = gCacheLongHits;
-window.gCacheSize = gCacheSize;
+window.gCacheMisses = () => Object.values(gCacheMisses).reduce((a, x) => a + x);
+window.gCacheHits = () => Object.values(gCacheHits).reduce((a, x) => a + x);
+window.gCacheLongHits = () => Object.values(gCacheLongHits).reduce((a, x) => a + x);
 window.Immutable = Immutable;
 const emptyForm = memoize(applib.emptyForm);
 const stateUpdate = memoize(applib.stateUpdate);
@@ -57,7 +56,8 @@ class Calc extends React.Component {
 
   handleCreatureClick(creature) {
     const features_type = this.state.toggle;
-    const features = merge(this.state[features_type], creature);
+    let features = this.state[features_type];
+    features = merge(features, creature);
     this.setState(this.dispatchStateUpdate(features, features_type));
   }
 
@@ -134,14 +134,12 @@ class Calc extends React.Component {
           {' '}{attacking_losses_average} {attacking_name}s perish.<br/>
           <table>
             <tbody>
-              <tr><td>Cache Size:</td>
-                  <td>{gCacheSize()}</td></tr>
               <tr><td>Cache Hits:</td>
-                  <td>{gCacheHits['stateUpdate']}</td></tr>
+                  <td>{window.gCacheHits()}</td></tr>
               <tr><td>Cache Long Hits:</td>
-                  <td>{gCacheLongHits['stateUpdate']}</td></tr>
+                  <td>{window.gCacheLongHits()}</td></tr>
               <tr><td>Cache Misses:</td>
-                  <td>{gCacheMisses['stateUpdate']}</td></tr>
+                  <td>{window.gCacheMisses()}</td></tr>
             </tbody>
           </table>
         </div>

@@ -13,7 +13,7 @@ export function parseType(name, value, previous_value) {
 }
 
 export function console_log(...args)  {
-  console.log(...args);
+  // console.log(...args);
 }
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -21,7 +21,6 @@ const hasOwnProperty = Object.prototype.hasOwnProperty;
 export function str(mapping) {
   let object = mapping;
   if (Immutable.isMap(mapping)) {
-    console.log('Immutable!');
     object = mapping.toJS();
   }
   if (typeof object === "object") {

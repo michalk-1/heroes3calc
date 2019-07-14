@@ -9,7 +9,6 @@ export function emptyForm() {
   return Map(entries);
 }
 
-
 export function stateUpdate(attacking, defending) {
 
   attacking = attacking.set('damage', calcAverage(Map({
@@ -33,7 +32,6 @@ export function stateUpdate(attacking, defending) {
     defending: defending,
   };
 }
-
 
 export function merge(x, y) {
   return x.merge(y);

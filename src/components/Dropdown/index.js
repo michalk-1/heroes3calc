@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Autocomplete from 'react-autocomplete';
 import style from './Dropdown.css';
 
@@ -34,31 +34,27 @@ function renderItem(item, isHighlighted) {
   );
 }
 
-export class Dropdown extends Component {
-
-
-  render() {
-    const values = Object.values(this.props.creature_data.by_name);
-    return (
-      <div>
-        <Autocomplete
-          value={this.props.value}
-          inputProps={{ id: 'states-autocomplete' }}
-          wrapperStyle={{ display: 'block' }}
-          items={values}
-          getItemValue={item => item.get('name')}
-          shouldItemRender={matchStateToTerm}
-          sortItems={sortStates}
-          onChange={(ev, value) => this.props.onChange(value)}
-          onSelect={value => this.props.onChange(value)}
-          renderMenu={children => (
-            <div className="menu">
-              {children}
-            </div>
-          )}
-          renderItem={renderItem}
-        />
-      </div>
-    );
-  }
+export function Dropdown(props) {
+  const values = Array.from(props.creature_data.by_name.values());
+  return (
+    <div>
+      <Autocomplete
+        value={props.value}
+        inputProps={{ id: 'states-autocomplete' }}
+        wrapperStyle={{ display: 'block' }}
+        items={values}
+        getItemValue={item => item.get('name')}
+        shouldItemRender={matchStateToTerm}
+        sortItems={sortStates}
+        onChange={(ev, value) => props.onChange(value)}
+        onSelect={value => props.onChange(value)}
+        renderMenu={children => (
+          <div className="menu">
+            {children}
+          </div>
+        )}
+        renderItem={renderItem}
+      />
+    </div>
+  );
 }
