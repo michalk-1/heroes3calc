@@ -11,8 +11,8 @@ export const gCacheLongHits = {};
 // memoized function is used as the map cache key. The func is invoked with the this binding of the memoized function.
 //
 // Note: The cache is exposed as the cache property on the memoized function. Its creation may be customized by
-// replacing the _.memoize.Cache constructor with one whose instances implement the Map method interface of clear,
-// delete, get, has, and set.
+// replacing the cacheCreate argument with one whose instances implement the Map method interface of clear,
+// delete, get, has, and set. The cache instance is then available under .cache property of the memoized function.
 
 function simpleCache() {
   const cache = {
@@ -45,7 +45,7 @@ function simpleCache() {
         },
       };
     },
-    all: {},  // caches by number of arguments that the function was called with
+    all: new Map(),  // caches by number of arguments that the function was called with
   };
   gSimpleCaches.push(cache);
   return cache;
@@ -97,13 +97,13 @@ export function memoize(fn, cacheCreate) {
   if (cacheCreate === undefined) {
     cacheCreate = simpleCache();
   }
-  const caches = cacheCreate.all;
+  const caches = cacheCreate.all || new Map();
   function fnMemoized(...args) {
     const length = args.length;
-    if (!caches.hasOwnProperty(length)) {
-      caches[length] = cacheCreate.create();
+    if (!caches.has(length)) {
+      caches.set(length, cacheCreate.create());
     }
-    let currentCache = caches[length];
+    let currentCache = caches.get(length);
     for (let i = 0; i < length - 1; ++i) {
       const createCall = () => cacheCreate.create();
       currentCache = unaryLookup(currentCache, createCall, args[i]);

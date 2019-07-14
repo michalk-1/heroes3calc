@@ -27,18 +27,13 @@ export function stateUpdate(attacking, defending) {
   attacking = calcTotalHealth(attacking);
   attacking = calcLosses(attacking, defending.get('damage'));
 
-  return {
+  return Object.freeze({
     attacking: attacking,
     defending: defending,
-  };
-}
-
-export function merge(x, y) {
-  return x.merge(y);
+  });
 }
 
 export default {
-  merge: merge,
   stateUpdate: stateUpdate,
   emptyForm: emptyForm,
 };
