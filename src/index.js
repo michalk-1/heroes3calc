@@ -100,33 +100,38 @@ class Calc extends React.Component {
     this.setState({toggle: type});
   }
 
+  static saveCurrent(state, previous) {
+    const current = {
+      attacking: state.attacking,
+      defending: state.defending
+    };
+
+    return featuresEqual(current, previous.last()) ?
+        previous : previous.push(Object.freeze(current));
+  }
+
+  static moveZipper(state, previous, next) {
+    if (next.size === 0)
+      return state;
+
+    return [Calc.saveCurrent(state, previous), next.last(), next.pop()];
+  }
+
   goBack() {
     this.setState(state => {
-      if (state.history.size === 0)
-        return state;
-
-      const current = {attacking: state.attacking, defending: state.defending};
-      if (!featuresEqual(current, state.future.last()))
-        state.future = state.future.push(Object.freeze(current));
-
-      const last = state.history.last();
-      state.history = state.history.pop();
-      return Object.assign(state, last);
+      let [previous, middle, next] = Calc.moveZipper(state, state.future, state.history);
+      state.history = next;
+      state.future = previous;
+      return Object.assign(state, middle);
     });
   }
 
   goForward() {
     this.setState(state => {
-      if (state.future.size === 0)
-        return state;
-
-      const current = {attacking: state.attacking, defending: state.defending};
-      if (!featuresEqual(current, state.history.last()))
-        state.history = state.history.push(Object.freeze(current));
-
-      const next = state.future.last();
-      state.future = state.future.pop();
-      return Object.assign(state, next);
+      let [previous, middle, next] = Calc.moveZipper(state, state.history, state.future);
+      state.history = previous;
+      state.future = next;
+      return Object.assign(state, middle);
     });
   }
 
