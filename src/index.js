@@ -148,8 +148,45 @@ class Calc extends React.Component {
     const defending_losses_average = defending.getIn(['losses', 'average']);
     return (
       <div className={style.calc}>
-        <div><button onClick={() => this.goBack()}>Back</button></div>
-        <div><button onClick={() => this.goForward()}>Forward</button></div>
+        <div className={style['attack-result']}>
+          <h3>{TITLES.attacking}</h3>
+          <AttackResult attacking={attacking}/>
+        </div>
+        <div className={style['retaliation-result']}>
+          <h3>{TITLES.defending}</h3>
+          <RetaliationResult defending={defending} />
+        </div>
+        <div className={style.tips}>
+          <h3>Tips</h3>
+          <div style={{padding: 16.38 + 'px'}}>
+            <p>Archery: add 2, 5, or 10 to the Additional Attack field.</p>
+            <p>Offense: add 2, 4, or 6 to the Additional Attack field.</p>
+            <p>Armorer: put the value (5, 10, or 15) in the Damage Reduction field.</p>
+          </div>
+        </div>
+        <div className={style.interactions}>
+          <div
+              className={style['interaction-wrapper']}
+              style={{transform: 'translate(-25%, 0%)'}}
+          >
+              <button className={`${style.interaction} ${style.noselect}`}
+                      onClick={() => this.goBack()}>🠄</button>
+          </div>
+          <div
+              className={style['interaction-wrapper']}
+              style={{transform: 'translate(0%, 0%)'}}
+          >
+            <button className={`${style.interaction} ${style.noselect}`}
+               onClick={() => this.handleSwap()}>⇄</button>
+          </div>
+          <div
+              className={style['interaction-wrapper']}
+              style={{transform: "translate(25%, 0%)"}}
+          >
+            <button className={`${style.interaction} ${style.noselect}`}
+                    onClick={() => this.goForward()}>🠆</button>
+          </div>
+        </div>
         <div className={style.attacking}>
           <Features type="attacking"
                     values={attacking}
@@ -160,13 +197,7 @@ class Calc extends React.Component {
                     creature_data={this.creature_data}
           />
         </div>
-        <div className={style.interactions}>
-          <div className={`${style.interaction} ${style.noselect}`}
-               onClick={() => this.handleSwap()}
-          >
-          ⇄
-          </div>
-        </div>
+        <div className={style.dummy}/>
         <div className={style.defending}>
           <Features type="defending"
                     values={defending}
@@ -176,23 +207,6 @@ class Calc extends React.Component {
                     onCreatureChange={creature => this.handleCreatureClick(creature)}
                     creature_data={this.creature_data}
           />
-        </div>
-        <div className={style['attack-result']}>
-          <h3>{TITLES.attacking}</h3>
-          <AttackResult attacking={attacking}/>
-        </div>
-        <div className={style.dummy}/>
-        <div className={style['retaliation-result']}>
-          <h3>{TITLES.defending}</h3>
-          <RetaliationResult defending={defending} />
-        </div>
-        <div className='tips'>
-          <h3>Tips</h3>
-          <div style={{padding: 16.38 + 'px'}}>
-            <p>Archery: add 2, 5, or 10 to the Additional Attack field.</p>
-            <p>Offense: add 2, 4, or 6 to the Additional Attack field.</p>
-            <p>Armorer: put the value (5, 10, or 15) in the Damage Reduction field.</p>
-          </div>
         </div>
         <div className={style.creatures}>
           <Creatures creature_data={this.creature_data}
