@@ -217,27 +217,12 @@ function Interactions(props) {
   const handleSwap = props.handleSwap;
   return (
     <div className={style.interactions}>
-      <div
-          className={style['interaction-wrapper']}
-          style={{transform: `translate(${-24-12}px, 0)`}}
-      >
-        <button className={`${style.interaction} ${style.noselect}`}
-                onClick={goBack}>🠄</button>
-      </div>
-      <div
-          className={style['interaction-wrapper']}
-          style={{transform: `translate(${-12}px, 0)`}}
-      >
-        <button className={`${style.interaction} ${style.noselect}`}
-                onClick={handleSwap}>⇄</button>
-      </div>
-      <div
-          className={style['interaction-wrapper']}
-          style={{transform: `translate(${24-12}px, 0)`}}
-      >
-        <button className={`${style.interaction} ${style.noselect}`}
-                onClick={goForward}>🠆</button>
-      </div>
+      <button className={`${style.interaction} ${style.noselect}`}
+              onClick={goBack}>🠄</button>
+      <button className={`${style.interaction} ${style.noselect}`}
+              onClick={handleSwap}>⇄</button>
+      <button className={`${style.interaction} ${style.noselect}`}
+              onClick={goForward}>🠆</button>
     </div>
   );
 }
