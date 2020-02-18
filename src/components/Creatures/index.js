@@ -114,28 +114,24 @@ export class Creatures extends React.Component {
   render() {
     return (
       <div className={style.creatures}>
-        Castle<br/>
-        {this.getCreaturesFromTown('Castle')}
-        <br/>Rampart<br/>
-        {this.getCreaturesFromTown('Rampart')}
-        <br/>Tower<br/>
-        {this.getCreaturesFromTown('Tower')}
-        <br/>Inferno<br/>
-        {this.getCreaturesFromTown('Inferno')}
-        <br/>Necropolis<br/>
-        {this.getCreaturesFromTown('Necropolis')}
-        <br/>Dungeon<br/>
-        {this.getCreaturesFromTown('Dungeon')}
-        <br/>Stronghold<br/>
-        {this.getCreaturesFromTown('Stronghold')}
-        <br/>Fortress<br/>
-        {this.getCreaturesFromTown('Fortress')}
-        <br/>Conflux<br/>
-        {this.getCreaturesFromTown('Conflux')}
-        <br/>Cove<br/>
-        {this.getCreaturesFromTown('Cove')}
-        <br/>Neutral<br/>
-        {this.getCreaturesFromTown('Neutral')}
+        Dragon Fly Hive<br/>
+        {this.getCreaturesFromBank('Dragon Fly Hive')}
+        <br/>Griffin Conservatory<br/>
+        {this.getCreaturesFromBank('Griffin Conservatory')}
+        <br/>Experimental Shop<br/>
+        {this.getCreaturesFromBank('Experimental Shop')}
+        <br/>Wolf Raider Picket<br/>
+        {this.getCreaturesFromBank('Wolf Raider Picket')}
+        <br/>Red Tower<br/>
+        {this.getCreaturesFromBank('Red Tower')}
+        <br/>Black Tower<br/>
+        {this.getCreaturesFromBank('Black Tower')}
+        <br/>Dwarven Treasury<br/>
+        {this.getCreaturesFromBank('Dwarven Treasury')}
+        <br/>Imp Cache<br/>
+        {this.getCreaturesFromBank('Imp Cache')}
+        <br/>Crypt<br/>
+        {this.getCreaturesFromBank('Crypt')}
       </div>
     );
   }
