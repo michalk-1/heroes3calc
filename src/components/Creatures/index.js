@@ -111,27 +111,37 @@ export class Creatures extends React.Component {
     return <div>{creatures}</div>;
   }
 
+  getCreaturesFromBank(bank) {
+    const creatures = this.creature_data.getBank(bank).map(record => {
+        const name = record.get('name');
+        const image = record.get('image');
+        <Creature key={name} name={name} image={image} town={town}
+                  onClick={name => this.handleCreatureClick(name)}/>
+    })
+  }
+
+
   render() {
     return (
       <div className={style.creatures}>
         Dragon Fly Hive<br/>
-        {this.getCreaturesFromBank('Dragon Fly Hive')}
+        {this.getCreaturesFromBank('dragon_fly_hive')}
         <br/>Griffin Conservatory<br/>
-        {this.getCreaturesFromBank('Griffin Conservatory')}
+        {this.getCreaturesFromBank('griffin_conservatory')}
         <br/>Experimental Shop<br/>
-        {this.getCreaturesFromBank('Experimental Shop')}
+        {this.getCreaturesFromBank('experimental_shop')}
         <br/>Wolf Raider Picket<br/>
-        {this.getCreaturesFromBank('Wolf Raider Picket')}
+        {this.getCreaturesFromBank('wolf_raider_picket')}
         <br/>Red Tower<br/>
-        {this.getCreaturesFromBank('Red Tower')}
+        {this.getCreaturesFromBank('red_tower')}
         <br/>Black Tower<br/>
-        {this.getCreaturesFromBank('Black Tower')}
+        {this.getCreaturesFromBank('black_tower')}
         <br/>Dwarven Treasury<br/>
-        {this.getCreaturesFromBank('Dwarven Treasury')}
+        {this.getCreaturesFromBank('dwarven_treasury')}
         <br/>Imp Cache<br/>
-        {this.getCreaturesFromBank('Imp Cache')}
+        {this.getCreaturesFromBank('imp_cache')}
         <br/>Crypt<br/>
-        {this.getCreaturesFromBank('Crypt')}
+        {this.getCreaturesFromBank('crypt')}
       </div>
     );
   }
