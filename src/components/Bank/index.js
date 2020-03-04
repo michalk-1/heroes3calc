@@ -1,12 +1,12 @@
 import React from 'react';
-import style from './Creature.css';
+import style from './Bank.css';
 
-export class Creature extends React.Component {
+export class Bank extends React.Component {
 
   render() {
     props = this.props;
     return (
-      <div className={style.creature}>
+      <div className={style.bank}>
         <img src={props.image} alt={props.name} onClick={() => props.onClick(props.name)}/>
       </div>
     );
