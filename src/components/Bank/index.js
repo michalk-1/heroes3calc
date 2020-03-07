@@ -7,7 +7,7 @@ export class Bank extends React.Component {
     props = this.props;
     return (
       <div className={style.bank}>
-        <img src={props.image} alt={props.name} onClick={() => props.onClick(props.name)}/>
+        <img src={props.image} alt={props.name} onClick={() => props.onClick()}/>
       </div>
     );
   }

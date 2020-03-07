@@ -1,6 +1,6 @@
 import React from 'react';
 import style from './Creatures.css';
-import { Creature } from '../Creature/index.js';
+import { Creature } from '../CreatureBank/index.js';
 import { TOWNS, SKELETON, SKELETON_WARRIOR } from '../../data.js';
 import Immutable from 'immutable';
 
@@ -103,8 +103,7 @@ export class Creatures extends React.Component {
       const name = record.get('name');
       const image = record.get('image');
       return (
-        <Creature key={name} name={name} image={image} town={town}
-                  onClick={name => this.handleCreatureClick(name)}/>
+        <CreatureBank /*bank=TODO onGuardClick=TODO*/>
       );
     });
 

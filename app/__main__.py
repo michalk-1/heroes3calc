@@ -34,9 +34,9 @@ gold_dragon = partial(one_stack, "gold_dragon")
 black_dragon = partial(one_stack, "black_dragon")
 
 
-# TODO: expand to royal griffins etc; disregard probabilities?
+# TODO: expand the levels list to royal griffins etc
 CREATURE_BANKS = {
-    "black_tower": [
+    "black_tower": [  # levels
         {"guards": [green_dragon(1)]},
         {"guards": [red_dragon(1)]},
         {"guards": [gold_dragon(1)]},

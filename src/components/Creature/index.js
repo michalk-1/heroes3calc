@@ -7,7 +7,7 @@ export class Creature extends React.Component {
     props = this.props;
     return (
       <div className={style.creature}>
-        <img src={props.image} alt={props.name} onClick={() => props.onClick(props.name)}/>
+        <img src={props.image} alt={props.name} onClick={() => props.onClick()}/>
       </div>
     );
   }
