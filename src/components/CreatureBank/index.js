@@ -23,7 +23,8 @@ export class CreatureBank extends React.Component {
     const bank_image = bank.get('image');
     const bank_name = bank.get('name');
     const levels = bank.get('levels');
-    const guards = levels.get(level_index);  // show only one level
+    const level = levels.get(level_index);  // show only one level
+    const guards = level.get('guards');
     return (
       <div className={style['creature-bank']}>
         <Bank image={bank_image} name={bank_name} onClick={() => {

@@ -12,4 +12,3 @@ export class Creature extends React.Component {
     );
   }
 }
-

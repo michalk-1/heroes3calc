@@ -7,6 +7,43 @@ import Immutable from 'immutable';
 const Map = Immutable.Map;
 const List = Immutable.List;
 
+function listBanksUri() {
+  const uri = `${window.location.origin}/d/banks`;
+  return uri;
+}
+
+function asyncGetBanks(creatures_by_name_promise) {
+  const banks_promise = fetch(listBanksUri)
+    .then(raw_response => raw_response.json())
+    .then(response => Immutable.fromJS(response['banks']),
+          error => { console.log(error); });
+  return Promise.all([banks_promise, creatures_by_name_promise], (results) => {
+    const [banks, creatures] = results;
+    const enhancedGuard = (guard) => {
+      const name = guard.get('name');
+      guard = guard.remove('name');
+      guard = guard.set('creature', creatures.get(name));
+      return guard;
+    };
+    const enhanceBank = (bank) => {
+       return bank.set('levels', bank.levels.withMutations(mutable_levels => {
+        for (let i = 0; i < mutable_levels.size; i++) {
+          const level = mutable_levels[i];
+          const guards = level.get('guards')
+          const enhanced_level  = level.set('guards', guards.map(enhancedGuard));
+          mutable_levels.set(i, enhanced_level);
+        }
+       }));
+    };
+    return banks.map(enhanceBank);
+  });
+}
+
+function listTownCreaturesUri(town) {
+  const uri = window.location.origin + '/d/list_of_creatures?town=' + town;
+  return uri;
+}
+
 export class CreatureData {
   constructor(owner) {
     const skeleton = Map(SKELETON);
@@ -15,7 +52,7 @@ export class CreatureData {
     this.by_name = Map({[SKELETON['name']]: skeleton, [SKELETON_WARRIOR['name']]: skeleton_warrior});
     let that = this;
     TOWNS.forEach(town => {
-      const uri = window.location.origin + '/d/list_of_creatures?town=' + town;
+      const uri = listTownCreaturesUri(town);
       fetch(uri)
         .then(response => response.json())
         .then(
@@ -87,45 +124,25 @@ export class Creatures extends React.Component {
   constructor(props) {
     super(props);
     this.creature_data = this.props.creature_data;
+    this.onGuardClick = this.onGuardClick.bind(this);
+    this.banks = props.banks;
   }
 
   onGuardClick(guard) {
     const creature_name = guard.getIn(['creature', 'name']);
     const number = guard.get('number');
     const creature = this.creature_data.getCreature({name: creature_name});
-    // TODO: figure out the way to propagate the number / amount.
-    this.props.onClick(creature);
-  }
-
-  getBank(bank_key) {
-    const banks = this.banks;
-    const bank = banks.get(bank_key);
-    return (
-        <CreatureBank bank={bank} onGuardClick={this.onGuardClick}/>
-    );
+    this.props.onClick(creature);  // TODO: figure out the way to propagate the number / amount.
   }
 
   render() {
+    const onGuardClick = this.onGuardClick;
+    const banks = this.banks;
     return (
       <div className={style.creatures}>
-        Dragon Fly Hive<br/>
-        {this.getCreaturesFromBank('dragon_fly_hive')}
-        <br/>Griffin Conservatory<br/>
-        {this.getCreaturesFromBank('griffin_conservatory')}
-        <br/>Experimental Shop<br/>
-        {this.getCreaturesFromBank('experimental_shop')}
-        <br/>Wolf Raider Picket<br/>
-        {this.getCreaturesFromBank('wolf_raider_picket')}
-        <br/>Red Tower<br/>
-        {this.getCreaturesFromBank('red_tower')}
-        <br/>Black Tower<br/>
-        {this.getCreaturesFromBank('black_tower')}
-        <br/>Dwarven Treasury<br/>
-        {this.getCreaturesFromBank('dwarven_treasury')}
-        <br/>Imp Cache<br/>
-        {this.getCreaturesFromBank('imp_cache')}
-        <br/>Crypt<br/>
-        {this.getCreaturesFromBank('crypt')}
+        {banks.map(
+          (bank, i) => <div id={`bank_${i}`}><CreatureBank bank={bank} onGuardClick={onGuardClick}/></div>
+        )}
       </div>
     );
   }

@@ -178,7 +178,7 @@ def create_app(test_config=None):
             app.root_path, "favicon.ico", mimetype="image/vnd.microsoft.icon"
         )
 
-    @app.route("/images/banks")
+    @app.route("/d/banks")
     def banks_list():
         banks_path = Path(app.root_path) / "data" / "images" / "banks"
         xs = []
