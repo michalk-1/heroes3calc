@@ -20,11 +20,13 @@ export class CreatureBank extends React.Component {
     const props = this.props;
     const onGuardClick = props.onGuardClick;
     const bank = props.bank;
-    const levels = bank.levels;
-    const guards = levels[level_index];  // show only one level
+    const bank_image = bank.get('image');
+    const bank_name = bank.get('name');
+    const levels = bank.get('levels');
+    const guards = levels.get(level_index);  // show only one level
     return (
       <div className={style['creature-bank']}>
-        <Bank image={bank.image} name={bank.name} onClick={() => {
+        <Bank image={bank_image} name={bank_name} onClick={() => {
           this.setState((s) => {
             const level_index = state.level_index;
             const next_level_index = (level_index + 1) % levels.length;
@@ -33,10 +35,13 @@ export class CreatureBank extends React.Component {
         }}/>
         <div className={style.guards}>
           {guards.map((guard, i) => {
-            const creature = guard.creature;
-            return <div id={`${bank.name}_${creature.name}_${i}`} className={style.guard}>
-              <div className={style.number}>{guard.number}</div>
-              <Creature image={creature.image} name={creature.name} onClick={() => onGuardClick(guard)}/>
+            const creature = guard.get('creature');
+            const creature_name = creature.get('name');
+            const creature_image = creature.get('image');
+            const guard_number = creature.get('number');
+            return <div id={`${bank_name}_${creature_name}_${i}`} className={style.guard}>
+              <div className={style.number}>{guard_number}</div>
+              <Creature image={creature_image} name={creature_name} onClick={() => onGuardClick(guard)}/>
             </div>
           }
           )}

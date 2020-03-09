@@ -35,7 +35,7 @@ black_dragon = partial(one_stack, "black_dragon")
 
 
 # TODO: expand the levels list to royal griffins etc
-CREATURE_BANKS = {
+CREATURE_BANKS_0 = {
     "black_tower": [  # levels
         {"guards": [green_dragon(1)]},
         {"guards": [red_dragon(1)]},
@@ -126,6 +126,10 @@ CREATURE_BANKS = {
         {"guards": five_stacks("wolf_raider", 150)},
     ],
 }
+CREATURE_BANKS = {
+    key: {"name": " ".join(map(str.capitalize, key.split("_"))), "levels": levels}
+    for key, levels in CREATURE_BANKS_0.items()
+}
 
 
 def create_app(test_config=None):
@@ -180,11 +184,8 @@ def create_app(test_config=None):
         xs = []
         for file_path in sorted(filter(lambda x: x.is_file(), banks_path.iterdir())):
             name = file_path.name.rsplit(file_path.suffix, 1)[0]
-            o = {
-                "name": name,
-                "image": str(file_path.relative_to(app.root_path)),
-                "creature_bank": CREATURE_BANKS[name],
-            }
+            o = {'image': str(file_path.relative_to(app.root_path))}
+            o.update(CREATURE_BANKS[name])
             xs.append(o)
 
         return jsonify({"banks": xs})

@@ -89,36 +89,21 @@ export class Creatures extends React.Component {
     this.creature_data = this.props.creature_data;
   }
 
-  handleCreatureClick(name) {
-    const creature = this.creature_data.getCreature({name: name});
+  onGuardClick(guard) {
+    const creature_name = guard.getIn(['creature', 'name']);
+    const number = guard.get('number');
+    const creature = this.creature_data.getCreature({name: creature_name});
+    // TODO: figure out the way to propagate the number / amount.
     this.props.onClick(creature);
   }
 
-  getCreaturesFromTown(town) {
-    if (!this.creature_data.hasTown(town)) {
-      return <div></div>;
-    }
-
-    const creatures = this.creature_data.getTown(town).map(record => {
-      const name = record.get('name');
-      const image = record.get('image');
-      return (
-        <CreatureBank /*bank=TODO onGuardClick=TODO*/>
-      );
-    });
-
-    return <div>{creatures}</div>;
+  getBank(bank_key) {
+    const banks = this.banks;
+    const bank = banks.get(bank_key);
+    return (
+        <CreatureBank bank={bank} onGuardClick={this.onGuardClick}/>
+    );
   }
-
-  getCreaturesFromBank(bank) {
-    const creatures = this.creature_data.getBank(bank).map(record => {
-        const name = record.get('name');
-        const image = record.get('image');
-        <Creature key={name} name={name} image={image} town={town}
-                  onClick={name => this.handleCreatureClick(name)}/>
-    })
-  }
-
 
   render() {
     return (
