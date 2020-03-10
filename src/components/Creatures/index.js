@@ -4,7 +4,6 @@ import { Creature } from '../CreatureBank/index.js';
 import { TOWNS, SKELETON, SKELETON_WARRIOR } from '../../data.js';
 import Immutable from 'immutable';
 
-const Map = Immutable.Map;
 const List = Immutable.List;
 
 function listBanksUri() {
@@ -12,7 +11,7 @@ function listBanksUri() {
   return uri;
 }
 
-function asyncGetBanks(creatures_by_name_promise) {
+export function asyncGetBanks(creatures_by_name_promise) {
   const banks_promise = fetch(listBanksUri)
     .then(raw_response => raw_response.json())
     .then(response => Immutable.fromJS(response['banks']),
@@ -46,10 +45,10 @@ function listTownCreaturesUri(town) {
 
 export class CreatureData {
   constructor(owner) {
-    const skeleton = Map(SKELETON);
-    const skeleton_warrior = Map(SKELETON_WARRIOR);
-    this.by_town = Map({[SKELETON['town']]: List([skeleton, skeleton_warrior])});
-    this.by_name = Map({[SKELETON['name']]: skeleton, [SKELETON_WARRIOR['name']]: skeleton_warrior});
+    const skeleton = Immutable.Map(SKELETON);
+    const skeleton_warrior = Immutable.Map(SKELETON_WARRIOR);
+    this.by_town = Immutable.Map({[SKELETON['town']]: List([skeleton, skeleton_warrior])});
+    this.by_name = Immutable.Map({[SKELETON['name']]: skeleton, [SKELETON_WARRIOR['name']]: skeleton_warrior});
     let that = this;
     TOWNS.forEach(town => {
       const uri = listTownCreaturesUri(town);
@@ -123,21 +122,13 @@ export class Creatures extends React.Component {
 
   constructor(props) {
     super(props);
-    this.creature_data = this.props.creature_data;
-    this.onGuardClick = this.onGuardClick.bind(this);
     this.banks = props.banks;
   }
 
-  onGuardClick(guard) {
-    const creature_name = guard.getIn(['creature', 'name']);
-    const number = guard.get('number');
-    const creature = this.creature_data.getCreature({name: creature_name});
-    this.props.onClick(creature);  // TODO: figure out the way to propagate the number / amount.
-  }
-
   render() {
-    const onGuardClick = this.onGuardClick;
-    const banks = this.banks;
+    const props = this.props;
+    const onGuardClick = props.onGuardClick;
+    const banks = this.banks || List();
     return (
       <div className={style.creatures}>
         {banks.map(

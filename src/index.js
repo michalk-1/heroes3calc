@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import style from './Calc.css';
 import {AttackResult} from './components/AttackResult/index.js';
 import {RetaliationResult} from './components/RetaliationResult/index.js';
-import {CreatureData, Creatures} from './components/Creatures/index.js';
+import {CreatureData, Creatures, asyncGetBanks} from './components/Creatures/index.js';
 import {Features} from './components/Features/index.js';
 import {TITLES} from './data.js';
 import applib from "./app-lib";
@@ -36,7 +36,16 @@ class Calc extends React.Component {
 
   constructor(props) {
     super(props);
-    this.creature_data = new CreatureData(this);
+    this.creature_data = undefined;  // TODO: handle creature_data being undefined
+    this.banks = undefined;
+    const creature_data_promise = asyncGetCreatureData();
+    const creature_by_name_promise = creature_data_promise.then((creature_data) => creature_data.by_name);
+    const banks_promise = asyncGetBanks(creature_by_name_promise);
+    creature_by_name_promise.then((creature_data) => { this.creature_data = creature_data; });
+    banks_promise.then((banks) => {
+      this.banks = banks;
+      this.forceUpdate();
+    })
     this.state = Object.assign(
       {
         toggle: 'attacking',
@@ -67,11 +76,12 @@ class Calc extends React.Component {
   // features_type: {attacking,defending}
   handleInputChange(features_type, input_name, parsed_value) {
     this.setState(state => {
+      const creature_data = this.creature_data;
       let features = state[features_type];
       features = features.set(input_name, parsed_value);
       const current = {attacking: state.attacking, defending: state.defending};
       const last = state.history.last();
-      if (input_name === 'name' && this.creature_data.hasCreature(parsed_value)) {
+      if (input_name === 'name' && creature_data && creature_data.hasCreature(parsed_value)) {
         if (!featuresEqual(current, last)) {
           state.history = state.history.push(Object.freeze(current));
           state.future = Immutable.List();
@@ -81,6 +91,12 @@ class Calc extends React.Component {
       }
       return Object.assign(state, dispatchStateUpdate(state, features, features_type));
     });
+  }
+
+  onGuardClick(guard) {
+    const creature = guard.get('creature')
+    this.handleCreatureClick(creature);
+    // TODO: set guard.number in the features.amount
   }
 
   handleCreatureClick(creature) {
@@ -149,6 +165,7 @@ class Calc extends React.Component {
     const defending_name = defending.get('name');
     const defending_damage_average = defending.getIn(['damage', 'average']);
     const defending_losses_average = defending.getIn(['losses', 'average']);
+    const banks = this.banks;
     return (
       <div className={style.calc}>
         <div className={style['attack-result']}>
@@ -194,9 +211,7 @@ class Calc extends React.Component {
           />
         </div>
         <div className={style.creatures}>
-          <Creatures creature_data={this.creature_data}
-                     onClick={creature => this.handleCreatureClick(creature)}
-          />
+          <Creatures banks={banks} onGuardClick={guard => this.onGuardClick(guard)}/>
         </div>
         <div className={style['fight-logs']}>
           The {attacking_name}s do {attacking_damage_average} damage.

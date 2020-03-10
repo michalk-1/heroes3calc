@@ -24,14 +24,14 @@ def five_stacks(name, number):
     return [one_stack(name, number // 5)] * 5
 
 
-skeleton = partial(one_stack, "skeleton")
-walking_dead = partial(one_stack, "walking_dead")
-wight = partial(one_stack, "wight")
-vampire = partial(one_stack, "vampire")
-green_dragon = partial(one_stack, "green_dragon")
-red_dragon = partial(one_stack, "red_dragon")
-gold_dragon = partial(one_stack, "gold_dragon")
-black_dragon = partial(one_stack, "black_dragon")
+skeleton = partial(one_stack, "Skeleton")
+walking_dead = partial(one_stack, "Walking Dead")
+wight = partial(one_stack, "Wight")
+vampire = partial(one_stack, "Vampire")
+green_dragon = partial(one_stack, "Green Dragon")
+red_dragon = partial(one_stack, "Red Dragon")
+gold_dragon = partial(one_stack, "Gold Dragon")
+black_dragon = partial(one_stack, "Black Dragon")
 
 
 # TODO: expand the levels list to royal griffins etc
@@ -65,10 +65,10 @@ CREATURE_BANKS_0 = {
         {"guards": [skeleton(20), walking_dead(20), wight(10), vampire(10)]},
     ],
     "dragon_fly_hive": [
-        {"guards": five_stacks("dragon_fly", 30)},
-        {"guards": five_stacks("dragon_fly", 45)},
-        {"guards": five_stacks("dragon_fly", 60)},
-        {"guards": five_stacks("dragon_fly", 90)},
+        {"guards": five_stacks("Dragon Fly", 30)},
+        {"guards": five_stacks("Dragon Fly", 45)},
+        {"guards": five_stacks("Dragon Fly", 60)},
+        {"guards": five_stacks("Dragon Fly", 90)},
     ],
     "dragon_utopia": [
         {"guards": [green_dragon(8), red_dragon(5), gold_dragon(2), black_dragon(1)]},
@@ -77,53 +77,53 @@ CREATURE_BANKS_0 = {
         {"guards": [green_dragon(8), red_dragon(7), gold_dragon(6), black_dragon(5)]},
     ],
     "dwarven_treasury": [
-        {"guards": five_stacks("dwarf", 50)},
-        {"guards": five_stacks("dwarf", 75)},
-        {"guards": five_stacks("dwarf", 100)},
-        {"guards": five_stacks("dwarf", 150)},
+        {"guards": five_stacks("Dwarf", 50)},
+        {"guards": five_stacks("Dwarf", 75)},
+        {"guards": five_stacks("Dwarf", 100)},
+        {"guards": five_stacks("Dwarf", 150)},
     ],
     "experimental_shop": [
-        {"guards": five_stacks("steel_golem", 25)},
-        {"guards": five_stacks("steel_golem", 50)},
-        {"guards": five_stacks("steel_golem", 75)},
-        {"guards": five_stacks("steel_golem", 100)},
+        {"guards": five_stacks("Steel Golem", 25)},
+        {"guards": five_stacks("Steel Golem", 50)},
+        {"guards": five_stacks("Steel Golem", 75)},
+        {"guards": five_stacks("Steel Golem", 100)},
     ],
     "griffin_conservatory": [
-        {"guards": five_stacks("griffin", 50)},
-        {"guards": five_stacks("griffin", 100)},
-        {"guards": five_stacks("griffin", 150)},
-        {"guards": five_stacks("griffin", 200)},
+        {"guards": five_stacks("Griffin", 50)},
+        {"guards": five_stacks("Griffin", 100)},
+        {"guards": five_stacks("Griffin", 150)},
+        {"guards": five_stacks("Griffin", 200)},
     ],
     "imp_cache": [{"guards": []}],
     "mansion": [
-        {"guards": five_stacks("vampire_lord", 40)},
-        {"guards": five_stacks("vampire_lord", 60)},
-        {"guards": five_stacks("vampire_lord", 80)},
-        {"guards": five_stacks("vampire_lord", 100)},
+        {"guards": five_stacks("Vampire Lord", 40)},
+        {"guards": five_stacks("Vampire Lord", 60)},
+        {"guards": five_stacks("Vampire Lord", 80)},
+        {"guards": five_stacks("Vampire Lord", 100)},
     ],
     "medusa_stores": [
-        {"guards": five_stacks("medusa", 20)},
-        {"guards": five_stacks("medusa", 30)},
-        {"guards": five_stacks("medusa", 40)},
-        {"guards": five_stacks("medusa", 50)},
+        {"guards": five_stacks("Medusa", 20)},
+        {"guards": five_stacks("Medusa", 30)},
+        {"guards": five_stacks("Medusa", 40)},
+        {"guards": five_stacks("Medusa", 50)},
     ],
     "naga_bank": [
-        {"guards": five_stacks("naga", 10)},
-        {"guards": five_stacks("naga", 15)},
-        {"guards": five_stacks("naga", 20)},
-        {"guards": five_stacks("naga", 30)},
+        {"guards": five_stacks("Naga", 10)},
+        {"guards": five_stacks("Naga", 15)},
+        {"guards": five_stacks("Naga", 20)},
+        {"guards": five_stacks("Naga", 30)},
     ],
     "red_tower": [
-        {"guards": five_stacks("fire_elemental", 35)},
-        {"guards": five_stacks("fire_elemental", 70)},
-        {"guards": five_stacks("fire_elemental", 105)},
-        {"guards": five_stacks("fire_elemental", 140)},
+        {"guards": five_stacks("Fire Elemental", 35)},
+        {"guards": five_stacks("Fire Elemental", 70)},
+        {"guards": five_stacks("Fire Elemental", 105)},
+        {"guards": five_stacks("Fire Elemental", 140)},
     ],
     "wolf_raider_picket": [
-        {"guards": five_stacks("wolf_raider", 50)},
-        {"guards": five_stacks("wolf_raider", 75)},
-        {"guards": five_stacks("wolf_raider", 100)},
-        {"guards": five_stacks("wolf_raider", 150)},
+        {"guards": five_stacks("Wolf Raider", 50)},
+        {"guards": five_stacks("Wolf Raider", 75)},
+        {"guards": five_stacks("Wolf Raider", 100)},
+        {"guards": five_stacks("Wolf Raider", 150)},
     ],
 }
 CREATURE_BANKS = {
