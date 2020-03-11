@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import style from './Calc.css';
 import {AttackResult} from './components/AttackResult/index.js';
 import {RetaliationResult} from './components/RetaliationResult/index.js';
-import {CreatureData, Creatures, asyncGetBanks} from './components/Creatures/index.js';
+import {Creatures, asyncGetBanks, asyncGetCreatureData} from './components/Creatures/index.js';
 import {Features} from './components/Features/index.js';
 import {TITLES} from './data.js';
 import applib from "./app-lib";
@@ -38,14 +38,6 @@ class Calc extends React.Component {
     super(props);
     this.creature_data = undefined;  // TODO: handle creature_data being undefined
     this.banks = undefined;
-    const creature_data_promise = asyncGetCreatureData();
-    const creature_by_name_promise = creature_data_promise.then((creature_data) => creature_data.by_name);
-    const banks_promise = asyncGetBanks(creature_by_name_promise);
-    creature_by_name_promise.then((creature_data) => { this.creature_data = creature_data; });
-    banks_promise.then((banks) => {
-      this.banks = banks;
-      this.forceUpdate();
-    })
     this.state = Object.assign(
       {
         toggle: 'attacking',
@@ -57,6 +49,14 @@ class Calc extends React.Component {
     this.goBack = this.goBack.bind(this);
     this.goForward = this.goForward.bind(this);
     this.handleSwap = this.handleSwap.bind(this);
+    const creature_data_promise = asyncGetCreatureData();
+    const creature_by_name_promise = creature_data_promise.then((creature_data) => creature_data.by_name);
+    const banks_promise = asyncGetBanks(creature_by_name_promise);
+    creature_by_name_promise.then((creature_data) => { this.creature_data = creature_data; });
+    banks_promise.then((banks) => {
+      this.banks = banks;
+      this.forceUpdate();
+    })
   }
 
   handleSwap() {
@@ -155,17 +155,19 @@ class Calc extends React.Component {
   }
 
   render() {
-    const attacking_active = this.state.toggle === 'attacking';
-    const defending_active = this.state.toggle === 'defending';
-    const attacking = this.state.attacking;
+    const state = this.state;
+    const attacking_active = state.toggle === 'attacking';
+    const defending_active = state.toggle === 'defending';
+    const attacking = state.attacking;
     const attacking_name = attacking.get('name');
     const attacking_damage_average = attacking.getIn(['damage', 'average']);
     const attacking_losses_average = attacking.getIn(['losses', 'average']);
-    const defending = this.state.defending;
+    const defending = state.defending;
     const defending_name = defending.get('name');
     const defending_damage_average = defending.getIn(['damage', 'average']);
     const defending_losses_average = defending.getIn(['losses', 'average']);
     const banks = this.banks;
+    const creature_data = this.creature_data;
     return (
       <div className={style.calc}>
         <div className={style['attack-result']}>
@@ -196,7 +198,7 @@ class Calc extends React.Component {
                     onInputChange={(...xs) => this.handleInputChange(...xs)}
                     onClick={type => this.handleFeaturesClick(type)}
                     onCreatureChange={creature => this.handleCreatureClick(creature)}
-                    creature_data={this.creature_data}
+                    creature_data={creature_data}
           />
         </div>
         <div className={style.dummy}/>
@@ -207,7 +209,7 @@ class Calc extends React.Component {
                     onInputChange={(...xs) => this.handleInputChange(...xs)}
                     onClick={type => this.handleFeaturesClick(type)}
                     onCreatureChange={creature => this.handleCreatureClick(creature)}
-                    creature_data={this.creature_data}
+                    creature_data={creature_data}
           />
         </div>
         <div className={style.creatures}>
@@ -218,8 +220,8 @@ class Calc extends React.Component {
           {' '}{defending_losses_average} {defending_name}s perish.<br/>
           The {defending_name}s do {defending_damage_average} damage.
           {' '}{attacking_losses_average} {attacking_name}s perish.<br/>
-          History: {this.state.history.size}<br/>
-          Future: {this.state.future.size}<br/>
+          History: {state.history.size}<br/>
+          Future: {state.future.size}<br/>
         </div>
       </div>
     );

@@ -26,12 +26,15 @@ export class Features extends React.Component {
 
   renderDropdown(title) {
     const name = NAMES[title];
+    const props = this.props;
+    const creature_data = props.creature_data;
+    const values = props.values;
     return (
       <div>
         <span>{title}: </span>
-        <Dropdown value={this.props.values.get(name)}
+        <Dropdown value={values.get(name)}
                   onChange={value => this.handleInputChange(name, value)}
-                  creature_data={this.props.creature_data}
+                  creature_data={creature_data}  // TODO: handle creature_data being undefined
         />
       </div>
     );
@@ -40,17 +43,23 @@ export class Features extends React.Component {
   handleInputChange(name, value) {
     const previous_value = this.state[name];
     const parsed_value = parseType(name, value, previous_value);
+    const props = this.props;
+    const creature_data = props.creature_data;
     this.props.onInputChange(this.props.type, name, parsed_value);
     this.setState({[name]: parsed_value});
-    if (name === 'name' && this.props.creature_data.hasCreature(value)) {
+    if (name === 'name' && creature_data && creature_data.hasCreature(value)) {
       this.handleCreatureChange(value);
     }
     return parsed_value;
   }
 
   handleCreatureChange(creature_name) {
-    const creature = this.props.creature_data.getCreature({name: creature_name});
-    this.props.onCreatureChange(creature);
+    const props = this.props;
+    const creature_data = props.creature_data;
+    if (creature_data) {
+      const creature = creature_data.getCreature({name: creature_name});
+      this.props.onCreatureChange(creature);
+    }
   }
 
   handleClick() {

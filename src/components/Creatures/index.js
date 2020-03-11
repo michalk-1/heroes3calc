@@ -43,6 +43,10 @@ function listTownCreaturesUri(town) {
   return uri;
 }
 
+export function asyncGetCreatureData() {
+  // TODO: reimplement from the CreatureData constructor
+}
+
 export class CreatureData {
   constructor(owner) {
     const skeleton = Immutable.Map(SKELETON);
