@@ -44,34 +44,29 @@ function listTownCreaturesUri(town) {
 }
 
 export function asyncGetCreatureData() {
-  // TODO: reimplement from the CreatureData constructor
+    return Promise.all(TOWNS.map((town) => {
+      const uri = listTownCreaturesUri(town);
+      return fetch(uri)
+        .then(response => response.json())
+        .then(json_response => [town, Immutable.fromJS(json_response['uri'])],
+              error => console.log(error))
+    })).then(
+      (town_and_creatures_list) => {
+        const by_town = Immutable.Map(town_and_creatures_list);
+        const by_name = Immutable.Map(town_and_creatures_list.flatMap((town_and_creatures) => {
+          const creatures = town_and_creatures[1];
+          return creatures.map(creature => [creature.get('name'), creature]);
+        }));
+        return new CreatureData({by_town: by_town, by_name: by_name});
+      },
+      (error) => console.log(error)
+    )
 }
 
-export class CreatureData {
-  constructor(owner) {
-    const skeleton = Immutable.Map(SKELETON);
-    const skeleton_warrior = Immutable.Map(SKELETON_WARRIOR);
-    this.by_town = Immutable.Map({[SKELETON['town']]: List([skeleton, skeleton_warrior])});
-    this.by_name = Immutable.Map({[SKELETON['name']]: skeleton, [SKELETON_WARRIOR['name']]: skeleton_warrior});
-    let that = this;
-    TOWNS.forEach(town => {
-      const uri = listTownCreaturesUri(town);
-      fetch(uri)
-        .then(response => response.json())
-        .then(
-          (json_response) => {
-            const list_of_creatures = Immutable.fromJS(json_response['uri']);
-            that.by_town = that.by_town.set(town, list_of_creatures);
-            list_of_creatures.forEach(creature => {
-              that.by_name = that.by_name.set(creature.get('name'), creature);
-            });
-            owner.forceUpdate();
-          },
-          (error) => {
-            console.log(error);
-          }
-        )
-    });
+class CreatureData {
+  constructor(creatures_data) {
+    this.by_town = creatures_data.by_town;
+    this.by_name = creatures_data.by_name;
   }
 
   getCreature(record) {
