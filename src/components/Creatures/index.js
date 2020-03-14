@@ -16,7 +16,7 @@ export function asyncGetBanks(creatures_by_name_promise) {
     .then(raw_response => raw_response.json())
     .then(response => Immutable.fromJS(response['banks']),
           error => { console.log(error); });
-  return Promise.all([banks_promise, creatures_by_name_promise], (results) => {
+  return Promise.all([banks_promise, creatures_by_name_promise]).then(results => {
     const [banks, creatures] = results;
     const enhancedGuard = (guard) => {
       const name = guard.get('name');
@@ -25,9 +25,10 @@ export function asyncGetBanks(creatures_by_name_promise) {
       return guard;
     };
     const enhanceBank = (bank) => {
-       return bank.set('levels', bank.levels.withMutations(mutable_levels => {
+       const levels = bank.get('levels');
+       return bank.set('levels', levels.withMutations(mutable_levels => {
         for (let i = 0; i < mutable_levels.size; i++) {
-          const level = mutable_levels[i];
+          const level = mutable_levels.get(i);
           const guards = level.get('guards')
           const enhanced_level  = level.set('guards', guards.map(enhancedGuard));
           mutable_levels.set(i, enhanced_level);
