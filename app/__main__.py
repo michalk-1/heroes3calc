@@ -184,6 +184,7 @@ def create_app(test_config=None):
         xs = []
         for file_path in sorted(filter(lambda x: x.is_file(), banks_path.iterdir())):
             name = file_path.name.rsplit(file_path.suffix, 1)[0]
+            if name == 'experimental_shop':  continue  # TODO: remove
             o = {'image': str(file_path.relative_to(app.root_path))}
             o.update(CREATURE_BANKS[name])
             xs.append(o)
