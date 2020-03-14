@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import style from './Calc.css';
 import applib from "../../app-lib";

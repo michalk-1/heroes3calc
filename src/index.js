@@ -1,3 +1,5 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { Calc } from './components/Calc/index.js';
 
 ReactDOM.render(
