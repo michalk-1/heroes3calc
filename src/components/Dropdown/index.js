@@ -35,7 +35,8 @@ function renderItem(item, isHighlighted) {
 }
 
 export function Dropdown(props) {
-  const values = Array.from(props.creature_data.by_name.values());
+  const creature_data = props.creature_data;
+  const values = creature_data ? Array.from(creature_data.by_name.values()) : [];
   return (
     <div>
       <Autocomplete

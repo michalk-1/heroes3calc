@@ -12,7 +12,6 @@ function listBanksUri() {
 }
 
 export function asyncGetBanks(creatures_by_name_promise) {
-  console.log(creatures_by_name_promise); // TODO: remove
   const banks_promise = fetch(listBanksUri())
     .then(raw_response => raw_response.json())
     .then(response => Immutable.fromJS(response['banks']),
@@ -49,15 +48,17 @@ export function asyncGetCreatureData() {
       const uri = listTownCreaturesUri(town);
       return fetch(uri)
         .then(response => response.json())
-        .then(json_response => [town, Immutable.fromJS(json_response['uri'])],
+        .then(json_response => List([town, Immutable.fromJS(json_response['uri'])]),
               error => console.log(error))
     })).then(
       (town_and_creatures_list) => {
+        town_and_creatures_list = List(town_and_creatures_list);
         const by_town = Immutable.Map(town_and_creatures_list);
-        const by_name = Immutable.Map(town_and_creatures_list.flatMap((town_and_creatures) => {
-          const creatures = town_and_creatures[1];
-          return creatures.map(creature => [creature.get('name'), creature]);
-        }));
+        const by_name_items = town_and_creatures_list.flatMap((town_and_creatures) => {
+          const creatures = town_and_creatures.get(1);
+          return creatures.map(creature => List([creature.get('name'), creature]));
+        });
+        const by_name = Immutable.Map(by_name_items);
         return new CreatureData({by_town: by_town, by_name: by_name});
       },
       (error) => console.log(error)

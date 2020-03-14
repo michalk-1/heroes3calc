@@ -48,10 +48,10 @@ export class Calc extends React.Component {
     this.handleSwap = this.handleSwap.bind(this);
     this.creature_data = undefined;
     const creature_data_promise = asyncGetCreatureData();
-    creature_data_promise.then((creature_data) => { this.creature_data = creature_data; });
+    creature_data_promise.then(creature_data => { this.creature_data = creature_data; });
     const banks_promise = asyncGetBanks(creature_data_promise.then(creature_data => creature_data.by_name));
     banks_promise.then((banks) => {
-      console.log('banks', banks); //TODO: remove
+      console.log(banks.map(x => x.toJS()));
       this.banks = banks;
       this.forceUpdate();
     })
@@ -71,7 +71,7 @@ export class Calc extends React.Component {
     });
   }
 
-  // features_type: {attacking,defending}
+  /// features_type: {attacking,defending}
   handleInputChange(features_type, input_name, parsed_value) {
     this.setState(state => {
       const creature_data = this.creature_data;
