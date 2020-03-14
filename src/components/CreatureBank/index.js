@@ -22,28 +22,24 @@ export class CreatureBank extends React.Component {
     const bank = props.bank;
     const bank_image = bank.get('image');
     const bank_name = bank.get('name');
-    console.log('bank name', bank_name);
     const levels = bank.get('levels');
-    console.log('levels', levels.toJS());
-    console.log('level_index', level_index);
     const level = levels.get(level_index);  // show only one level
-    console.log('level', level.toJS());
     const guards = level.get('guards');
     return (
       <div className={style['creature-bank']}>
         <Bank image={bank_image} name={bank_name} onClick={() => {
-          this.setState((s) => {
+          this.setState((state) => {
             const level_index = state.level_index;
-            const next_level_index = (level_index + 1) % levels.length;
+            const next_level_index = (level_index + 1) % levels.size;
             return {level_index: next_level_index};
           });
         }}/>
         <div className={style.guards}>
           {guards.map((guard, i) => {
             const creature = guard.get('creature');
+            const guard_number = guard.get('number');
             const creature_name = creature.get('name');
             const creature_image = creature.get('image');
-            const guard_number = creature.get('number');
             return <div id={`${bank_name}_${creature_name}_${i}`} className={style.guard}>
               <div className={style.number}>{guard_number}</div>
               <Creature image={creature_image} name={creature_name} onClick={() => onGuardClick(guard)}/>
