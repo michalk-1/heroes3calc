@@ -12,7 +12,8 @@ function listBanksUri() {
 }
 
 export function asyncGetBanks(creatures_by_name_promise) {
-  const banks_promise = fetch(listBanksUri)
+  console.log(creatures_by_name_promise); // TODO: remove
+  const banks_promise = fetch(listBanksUri())
     .then(raw_response => raw_response.json())
     .then(response => Immutable.fromJS(response['banks']),
           error => { console.log(error); });
