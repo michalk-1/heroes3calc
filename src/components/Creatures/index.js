@@ -122,15 +122,10 @@ class CreatureData {
 
 export class Creatures extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.banks = props.banks;
-  }
-
   render() {
     const props = this.props;
     const onGuardClick = props.onGuardClick;
-    const banks = this.banks || List();
+    const banks = props.banks;
     return (
       <div className={style.creatures}>
         {banks.map(
