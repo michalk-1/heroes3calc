@@ -34,7 +34,7 @@ export class Features extends React.Component {
         <span>{title}: </span>
         <Dropdown value={values.get(name)}
                   onChange={value => this.handleInputChange(name, value)}
-                  creature_data={creature_data}  // TODO: handle creature_data being undefined
+                  creature_data={creature_data}
         />
       </div>
     );
