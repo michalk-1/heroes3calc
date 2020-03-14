@@ -1,6 +1,6 @@
 import React from 'react';
 import style from './Creatures.css';
-import { Creature } from '../CreatureBank/index.js';
+import { CreatureBank } from '../CreatureBank/index.js';
 import { TOWNS, SKELETON, SKELETON_WARRIOR } from '../../data.js';
 import Immutable from 'immutable';
 
@@ -26,7 +26,7 @@ export function asyncGetBanks(creatures_by_name_promise) {
     };
     const enhanceBank = (bank) => {
        const levels = bank.get('levels');
-       return bank.set('levels', levels.withMutations(mutable_levels => {
+       const bank_1 = bank.set('levels', levels.withMutations(mutable_levels => {
         for (let i = 0; i < mutable_levels.size; i++) {
           const level = mutable_levels.get(i);
           const guards = level.get('guards')
@@ -34,6 +34,7 @@ export function asyncGetBanks(creatures_by_name_promise) {
           mutable_levels.set(i, enhanced_level);
         }
        }));
+       return bank_1;
     };
     return banks.map(enhanceBank);
   });
@@ -62,7 +63,7 @@ export function asyncGetCreatureData() {
         const by_name = Immutable.Map(by_name_items);
         return new CreatureData({by_town: by_town, by_name: by_name});
       },
-      (error) => console.log(error)
+      error => console.log(error)
     )
 }
 

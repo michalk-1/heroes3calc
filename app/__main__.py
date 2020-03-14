@@ -1,6 +1,7 @@
 import os
 from functools import partial
 from pathlib import Path
+from typing import Union, Mapping, Sequence
 
 from flask import (
     Flask,
@@ -15,11 +16,11 @@ from flask import (
 from app.via import csv as via_csv
 
 
-def one_stack(name, number):
+def one_stack(name: str, number: int) -> Mapping[str, Union[str, int]]:
     return {"name": name, "number": number}
 
 
-def five_stacks(name, number):
+def five_stacks(name: str, number: int) -> Sequence[Mapping[str, Union[str, int]]]:
     assert number % 5 == 0, number
     return [one_stack(name, number // 5)] * 5
 
@@ -94,7 +95,12 @@ CREATURE_BANKS_0 = {
         {"guards": five_stacks("Griffin", 150)},
         {"guards": five_stacks("Griffin", 200)},
     ],
-    "imp_cache": [{"guards": []}],
+    "imp_cache": [
+        {"guards": five_stacks("Imp", 100)},
+        {"guards": five_stacks("Imp", 150)},
+        {"guards": five_stacks("Imp", 200)},
+        {"guards": five_stacks("Imp", 300)},
+    ],
     "mansion": [
         {"guards": five_stacks("Vampire Lord", 40)},
         {"guards": five_stacks("Vampire Lord", 60)},
@@ -180,12 +186,13 @@ def create_app(test_config=None):
 
     @app.route("/d/banks")
     def banks_list():
-        banks_path = Path(app.root_path) / "data" / "images" / "banks"
+        data_path = Path(app.root_path) / "data"
+        banks_path = data_path / "images" / "banks"
         xs = []
         for file_path in sorted(filter(lambda x: x.is_file(), banks_path.iterdir())):
             name = file_path.name.rsplit(file_path.suffix, 1)[0]
-            if name == 'experimental_shop':  continue  # TODO: remove
-            o = {'image': str(file_path.relative_to(app.root_path))}
+            if name == "experimental_shop": continue  # TODO: remove
+            o = {"image": f"/{file_path.relative_to(data_path)}"}
             o.update(CREATURE_BANKS[name])
             xs.append(o)
 

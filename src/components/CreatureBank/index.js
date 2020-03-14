@@ -11,7 +11,7 @@ export class CreatureBank extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {level: 0};
+    this.state = {level_index: 0};
   }
 
   render() {
@@ -22,8 +22,12 @@ export class CreatureBank extends React.Component {
     const bank = props.bank;
     const bank_image = bank.get('image');
     const bank_name = bank.get('name');
+    console.log('bank name', bank_name);
     const levels = bank.get('levels');
+    console.log('levels', levels.toJS());
+    console.log('level_index', level_index);
     const level = levels.get(level_index);  // show only one level
+    console.log('level', level.toJS());
     const guards = level.get('guards');
     return (
       <div className={style['creature-bank']}>
