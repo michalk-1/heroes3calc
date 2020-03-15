@@ -20,6 +20,9 @@ export class CreatureBank extends React.Component {
     const props = this.props;
     const onGuardClick = props.onGuardClick;
     const bank = props.bank;
+    if (bank === undefined) {
+      return <div className={style.guards} />
+    }
     const bank_image = bank.get('image');
     const bank_name = bank.get('name');
     const levels = bank.get('levels');
@@ -40,7 +43,7 @@ export class CreatureBank extends React.Component {
             const guard_number = guard.get('number');
             const creature_name = creature.get('name');
             const creature_image = creature.get('image');
-            return <div id={`${bank_name}_${creature_name}_${i}`} className={style.guard}>
+            return <div key={`${bank_name}_${creature_name}_${i}`} className={style.guard}>
               <div className={style.number}>{guard_number}</div>
               <Creature image={creature_image} name={creature_name} onClick={() => onGuardClick(guard)}/>
             </div>

@@ -50,7 +50,7 @@ export class Calc extends React.Component {
     const creature_data_promise = asyncGetCreatureData();
     creature_data_promise.then(creature_data => { this.creature_data = creature_data; });
     const banks_promise = asyncGetBanks(creature_data_promise.then(creature_data => creature_data.by_name));
-    banks_promise.then((banks) => {
+    banks_promise.then(banks => {
       this.banks = banks;
       this.forceUpdate();
     })

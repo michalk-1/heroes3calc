@@ -11,6 +11,15 @@ function listBanksUri() {
   return uri;
 }
 
+export function asyncGetBank(bank_name) {
+    const creature_data_promise = asyncGetCreatureData();
+    const banks_promise = asyncGetBanks(creature_data_promise.then(creature_data => creature_data.by_name));
+    return banks_promise.then(banks => {
+      const bank = banks.find(bank => bank.get('name') === bank_name);
+      return bank;
+    })
+}
+
 export function asyncGetBanks(creatures_by_name_promise) {
   const banks_promise = fetch(listBanksUri())
     .then(raw_response => raw_response.json())
