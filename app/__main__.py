@@ -15,14 +15,28 @@ from flask import (
 
 from app.via import csv as via_csv
 
+StackType = Mapping[str, Union[str, int]]
 
-def one_stack(name: str, number: int) -> Mapping[str, Union[str, int]]:
+
+def one_stack(name: str, number: int) -> StackType:
     return {"name": name, "number": number}
 
 
-def five_stacks(name: str, number: int) -> Sequence[Mapping[str, Union[str, int]]]:
+def five_stacks(name: str, number: int) -> Sequence[StackType]:
     assert number % 5 == 0, number
     return [one_stack(name, number // 5)] * 5
+
+
+def five_stacks_with_upgrade(name: str, upgrade_name: str, number: int) -> Sequence[StackType]:
+    assert number % 5 == 0, number
+    number_per_stack = number // 5
+    return [
+        one_stack(name, number_per_stack),
+        one_stack(name, number_per_stack),
+        one_stack(upgrade_name, number_per_stack),
+        one_stack(name, number_per_stack),
+        one_stack(name, number_per_stack),
+    ]
 
 
 skeleton = partial(one_stack, "Skeleton")
@@ -78,10 +92,10 @@ CREATURE_BANKS_0 = {
         {"guards": [green_dragon(8), red_dragon(7), gold_dragon(6), black_dragon(5)]},
     ],
     "dwarven_treasury": [
-        {"guards": five_stacks("Dwarf", 50)},
-        {"guards": five_stacks("Dwarf", 75)},
-        {"guards": five_stacks("Dwarf", 100)},
-        {"guards": five_stacks("Dwarf", 150)},
+        {"guards": five_stacks_with_upgrade("Dwarf", "Battle Dwarf", 50)},
+        {"guards": five_stacks_with_upgrade("Dwarf", "Battle Dwarf", 75)},
+        {"guards": five_stacks_with_upgrade("Dwarf", "Battle Dwarf", 100)},
+        {"guards": five_stacks_with_upgrade("Dwarf", "Battle Dwarf", 150)},
     ],
     "experimental_shop": [
         {"guards": five_stacks("Steel Golem", 25)},
@@ -90,16 +104,16 @@ CREATURE_BANKS_0 = {
         {"guards": five_stacks("Steel Golem", 100)},
     ],
     "griffin_conservatory": [
-        {"guards": five_stacks("Griffin", 50)},
-        {"guards": five_stacks("Griffin", 100)},
-        {"guards": five_stacks("Griffin", 150)},
-        {"guards": five_stacks("Griffin", 200)},
+        {"guards": five_stacks_with_upgrade("Griffin", "Royal Griffin", 50)},
+        {"guards": five_stacks_with_upgrade("Griffin", "Royal Griffin", 100)},
+        {"guards": five_stacks_with_upgrade("Griffin", "Royal Griffin", 150)},
+        {"guards": five_stacks_with_upgrade("Griffin", "Royal Griffin", 200)},
     ],
     "imp_cache": [
-        {"guards": five_stacks("Imp", 100)},
-        {"guards": five_stacks("Imp", 150)},
-        {"guards": five_stacks("Imp", 200)},
-        {"guards": five_stacks("Imp", 300)},
+        {"guards": five_stacks_with_upgrade("Imp", "Familiar", 100)},
+        {"guards": five_stacks_with_upgrade("Imp", "Familiar", 150)},
+        {"guards": five_stacks_with_upgrade("Imp", "Familiar", 200)},
+        {"guards": five_stacks_with_upgrade("Imp", "Familiar", 300)},
     ],
     "mansion": [
         {"guards": five_stacks("Vampire Lord", 40)},
@@ -108,22 +122,22 @@ CREATURE_BANKS_0 = {
         {"guards": five_stacks("Vampire Lord", 100)},
     ],
     "medusa_stores": [
-        {"guards": five_stacks("Medusa", 20)},
-        {"guards": five_stacks("Medusa", 30)},
-        {"guards": five_stacks("Medusa", 40)},
-        {"guards": five_stacks("Medusa", 50)},
+        {"guards": five_stacks_with_upgrade("Medusa", "Medusa Queen", 20)},
+        {"guards": five_stacks_with_upgrade("Medusa", "Medusa Queen", 30)},
+        {"guards": five_stacks_with_upgrade("Medusa", "Medusa Queen", 40)},
+        {"guards": five_stacks_with_upgrade("Medusa", "Medusa Queen", 50)},
     ],
     "naga_bank": [
-        {"guards": five_stacks("Naga", 10)},
-        {"guards": five_stacks("Naga", 15)},
-        {"guards": five_stacks("Naga", 20)},
-        {"guards": five_stacks("Naga", 30)},
+        {"guards": five_stacks_with_upgrade("Naga", "Naga Queen", 10)},
+        {"guards": five_stacks_with_upgrade("Naga", "Naga Queen", 15)},
+        {"guards": five_stacks_with_upgrade("Naga", "Naga Queen", 20)},
+        {"guards": five_stacks_with_upgrade("Naga", "Naga Queen", 30)},
     ],
     "red_tower": [
-        {"guards": five_stacks("Fire Elemental", 35)},
-        {"guards": five_stacks("Fire Elemental", 70)},
-        {"guards": five_stacks("Fire Elemental", 105)},
-        {"guards": five_stacks("Fire Elemental", 140)},
+        {"guards": five_stacks_with_upgrade("Fire Elemental", "Energy Elemental", 35)},
+        {"guards": five_stacks_with_upgrade("Fire Elemental", "Energy Elemental", 70)},
+        {"guards": five_stacks_with_upgrade("Fire Elemental", "Energy Elemental", 105)},
+        {"guards": five_stacks_with_upgrade("Fire Elemental", "Energy Elemental", 140)},
     ],
     "wolf_raider_picket": [
         {"guards": five_stacks("Wolf Raider", 50)},
