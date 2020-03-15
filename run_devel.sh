@@ -25,6 +25,5 @@ function browse() {
 export FLASK_APP=app
 export FLASK_ENV=development
 npm run build-dev
-browse &
 cd ${__dir}
 flask run

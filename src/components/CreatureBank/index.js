@@ -1,6 +1,5 @@
 import React from 'react';
 import style from './CreatureBank.css';
-import { Creature } from '../Creature/index.js';
 import { Bank } from '../Bank/index.js';
 
 export class CreatureBank extends React.Component {
@@ -45,7 +44,9 @@ export class CreatureBank extends React.Component {
             const creature_image = creature.get('image');
             return <div key={`${bank_name}_${creature_name}_${i}`} className={style.guard}>
               <div className={style.number}>{guard_number}</div>
-              <Creature image={creature_image} name={creature_name} onClick={() => onGuardClick(guard)}/>
+              <div className={style.creature}>
+                <img src={creature_image} alt={creature_name} onClick={() => onGuardClick(guard)}/>
+              </div>
             </div>
           }
           )}

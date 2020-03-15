@@ -1,4 +1,14 @@
 .bank {
-  display: inline;
-  padding: 2px;
+  display: inline-block;
+  width: 92px;
+  height: 89px;
+  position: relative;
+  border: 1px solid black;
+}
+
+.bank img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
