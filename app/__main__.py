@@ -115,7 +115,7 @@ CREATURE_BANKS_0 = {
         {"guards": five_stacks_with_upgrade("Imp", "Familiar", 200)},
         {"guards": five_stacks_with_upgrade("Imp", "Familiar", 300)},
     ],
-    "mansion": [
+    "mansion": [  # TODO: remove?
         {"guards": five_stacks("Vampire Lord", 40)},
         {"guards": five_stacks("Vampire Lord", 60)},
         {"guards": five_stacks("Vampire Lord", 80)},
