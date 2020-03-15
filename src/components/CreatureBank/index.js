@@ -36,20 +36,29 @@ export class CreatureBank extends React.Component {
             return {level_index: next_level_index};
           });
         }}/>
+        <div className={style['guards-container']}>
         <div className={style.guards}>
           {guards.map((guard, i) => {
             const creature = guard.get('creature');
             const guard_number = guard.get('number');
             const creature_name = creature.get('name');
             const creature_image = creature.get('image');
-            return <div key={`${bank_name}_${creature_name}_${i}`} className={style.guard}>
-              <div className={style.number}>{guard_number}</div>
-              <div className={style.creature}>
-                <img src={creature_image} alt={creature_name} onClick={() => onGuardClick(guard)}/>
+            return (
+              <div key={`${bank_name}_${creature_name}_${i}`}
+                   className={style.guard}
+              >
+                <div className={style.number}>{guard_number}</div>
+                <div className={style.creature}>
+                  <img src={creature_image}
+                       alt={creature_name}
+                       onClick={() => onGuardClick(guard)}
+                  />
+                </div>
               </div>
-            </div>
+            );
           }
           )}
+        </div>
         </div>
       </div>
     );

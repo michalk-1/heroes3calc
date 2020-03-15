@@ -1,9 +1,8 @@
 .bank {
   display: inline-block;
   width: 92px;
-  height: 89px;
+  height: 105px;
   position: relative;
-  border: 1px solid black;
 }
 
 .bank img {

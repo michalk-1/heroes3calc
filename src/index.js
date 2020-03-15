@@ -26,6 +26,6 @@ export class CreatureBankApp extends React.Component {
 }
 
 ReactDOM.render(
-    <CreatureBankApp />,
+    <Calc />,
     document.getElementById('index')
 );
