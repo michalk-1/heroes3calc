@@ -116,7 +116,7 @@ export const TITLES = {
   additional_attack: 'Additional Attack',
   additional_defense: 'Additional Defense',
   ai_value: 'AI Value',
-  amount: 'Amount',
+  amount: 'Number',
   attack: 'Attack',
   attacking: 'Attacking',
   cost: 'Cost',

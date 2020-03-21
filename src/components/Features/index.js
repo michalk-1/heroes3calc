@@ -73,20 +73,16 @@ export class Features extends React.Component {
       <div className={current_style} onClick={this.handleClick}>
         {this.renderDropdown(TITLES.name)}
         {this.renderInput(TITLES.amount)}
-        {this.renderInput(TITLES.additional_attack)}
-        {this.renderInput(TITLES.additional_defense)}
-        {this.renderInput(TITLES.damage_reduction)}
+        {this.renderInput(TITLES.health)}
+        {this.renderInput(TITLES.speed)}
         {this.renderInput(TITLES.attack)}
         {this.renderInput(TITLES.defense)}
         {this.renderInput(TITLES.minimum_damage)}
         {this.renderInput(TITLES.maximum_damage)}
-        {this.renderInput(TITLES.health)}
-        {this.renderInput(TITLES.level)}
-        {this.renderInput(TITLES.speed)}
-        {this.renderInput(TITLES.growth)}
-        {this.renderInput(TITLES.ai_value)}
-        {this.renderInput(TITLES.cost)}
         {this.renderInput(TITLES.special)}
+        {this.renderInput(TITLES.additional_attack)}
+        {this.renderInput(TITLES.additional_defense)}
+        {this.renderInput(TITLES.damage_reduction)}
       </div>
     );
   }

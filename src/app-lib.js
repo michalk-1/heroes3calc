@@ -10,7 +10,6 @@ export function emptyForm() {
 }
 
 export function stateUpdate(attacking, defending) {
-
   attacking = attacking.set('damage', calcAverage(Map({
     minimum: calcMin(attacking, defending),
     maximum: calcMax(attacking, defending),
