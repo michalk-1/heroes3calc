@@ -22,14 +22,6 @@ function featuresEqual(lhs, rhs) {
   return Immutable.is(lhs.attacking, rhs.attacking) && Immutable.is(lhs.defending, rhs.defending);
 }
 
-function dispatchStateUpdate(state, features, features_type) {
-  if (features_type === 'attacking') {
-    return stateUpdate(features, state.defending);
-  } else {
-    return stateUpdate(state.attacking, features);
-  }
-}
-
 export class Calc extends React.Component {
 
   constructor(props) {
@@ -37,7 +29,7 @@ export class Calc extends React.Component {
     this.banks = Immutable.List();
     this.state = Object.assign(
       {
-        toggle: 'attacking',
+        toggle: 'defending',
         history: Immutable.List(),
         future: Immutable.List(),
       },
@@ -56,6 +48,18 @@ export class Calc extends React.Component {
     })
   }
 
+  static updateHistory(state) {
+      const current = {attacking: state.attacking, defending: state.defending};
+      const last = state.history.last();
+      if (!featuresEqual(last, current)) {
+        const history = state.history.push(Object.freeze(current));
+        const future = Immutable.List();
+        return [history, future];
+      } else {
+        return [state.history, state.future];
+      }
+  }
+
   handleSwap() {
     this.setState(state => {
       const current = {attacking: state.attacking, defending: state.defending};
@@ -70,12 +74,18 @@ export class Calc extends React.Component {
     });
   }
 
-  /// features_type: {attacking,defending}
-  handleInputChange(features_type, input_name, parsed_value) {
+  static dispatchStateUpdate(state, features, features_type) {
+    if (features_type === 'attacking') {
+      return stateUpdate(features, state.defending);
+    } else { // features_type === 'defending'
+      return stateUpdate(state.attacking, features);
+    }
+  }
+
+  propagateFeatureChange(features_type, input_name, parsed_value) {
     this.setState(state => {
       const creature_data = this.creature_data;
-      let features = state[features_type];
-      features = features.set(input_name, parsed_value);
+      const features = state[features_type].set(input_name, parsed_value);
       const current = {attacking: state.attacking, defending: state.defending};
       const last = state.history.last();
       if (input_name === 'name' && creature_data && creature_data.hasCreature(parsed_value)) {
@@ -86,33 +96,37 @@ export class Calc extends React.Component {
       } else {
         state.history = state.history.update(state.history.size - 1, () => current);
       }
-      return Object.assign(state, dispatchStateUpdate(state, features, features_type));
+      return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
     });
   }
 
-  onGuardClick(guard) {
-    const creature = guard.get('creature')
-    this.handleCreatureClick(creature);
-    // TODO: set guard.number in the features.amount
-  }
-
-  handleCreatureClick(creature) {
-    this.setState(state => {
+  static getCurrentFeatures(state) {
       const features_type = state.toggle;
-      let features = state[features_type];
-      features = features.merge(creature);
-      const current = {attacking: state.attacking, defending: state.defending};
-      const last = state.history.last();
-      if (!featuresEqual(current, last)) {
-        state.history = state.history.push(Object.freeze(current));
-        state.future = Immutable.List();
-      }
+      const features = state[features_type];
+      return features;
+  }
 
-      return Object.assign(state, dispatchStateUpdate(state, features, features_type));
+  propagateGuardFeatures(guard){
+    this.setState(state => {
+      const creature = guard.get('creature');
+      const number = guard.get('number')
+      const features = Calc.getCurrentFeatures(state).merge(creature).set('amount', number);
+      const features_type = state.toggle;
+      [state.history, state.future] = Calc.updateHistory(state);
+      return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
+    })
+  }
+
+  propagateCreatureFeatures(creature) {
+    this.setState(state => {
+      const features = Calc.getCurrentFeatures(state).merge(creature);
+      const features_type = state.toggle;
+      [state.history, state.future] = Calc.updateHistory(state);
+      return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
     });
   }
 
-  handleFeaturesClick(type) {
+  setActiveFeatures(type) {
     this.setState({toggle: type});
   }
 
@@ -192,9 +206,9 @@ export class Calc extends React.Component {
           <Features type="attacking"
                     values={attacking}
                     active={attacking_active}
-                    onInputChange={(...xs) => this.handleInputChange(...xs)}
-                    onClick={type => this.handleFeaturesClick(type)}
-                    onCreatureChange={creature => this.handleCreatureClick(creature)}
+                    onInputChange={(...xs) => this.propagateFeatureChange(...xs)}
+                    onClick={type => this.setActiveFeatures(type)}
+                    onCreatureChange={creature => this.propagateCreatureFeatures(creature)}
                     creature_data={creature_data}
           />
         </div>
@@ -203,14 +217,14 @@ export class Calc extends React.Component {
           <Features type="defending"
                     values={defending}
                     active={defending_active}
-                    onInputChange={(...xs) => this.handleInputChange(...xs)}
-                    onClick={type => this.handleFeaturesClick(type)}
-                    onCreatureChange={creature => this.handleCreatureClick(creature)}
+                    onInputChange={(...xs) => this.propagateFeatureChange(...xs)}
+                    onClick={type => this.setActiveFeatures(type)}
+                    onCreatureChange={creature => this.propagateCreatureFeatures(creature)}
                     creature_data={creature_data}
           />
         </div>
         <div className={style.creatures}>
-          <Creatures banks={banks} onGuardClick={guard => this.onGuardClick(guard)}/>
+          <Creatures banks={banks} onGuardClick={guard => this.propagateGuardFeatures(guard)}/>
         </div>
         <div className={style['fight-logs']}>
           The {attacking_name}s do {attacking_damage_average} damage.
