@@ -37,7 +37,7 @@ export class Calc extends React.Component {
     );
     this.goBack = this.goBack.bind(this);
     this.goForward = this.goForward.bind(this);
-    this.handleSwap = this.handleSwap.bind(this);
+    this.swapFeatureTypes = this.swapFeatureTypes.bind(this);
     this.creature_data = undefined;
     const creature_data_promise = asyncGetCreatureData();
     creature_data_promise.then(creature_data => { this.creature_data = creature_data; });
@@ -48,7 +48,7 @@ export class Calc extends React.Component {
     })
   }
 
-  static updateHistory(state) {
+  static addToHistory(state) {
       const current = {attacking: state.attacking, defending: state.defending};
       const last = state.history.last();
       if (!featuresEqual(last, current)) {
@@ -60,14 +60,9 @@ export class Calc extends React.Component {
       }
   }
 
-  handleSwap() {
+  swapFeatureTypes() {
     this.setState(state => {
-      const current = {attacking: state.attacking, defending: state.defending};
-      const last = state.history.last();
-      if (!featuresEqual(current, last)) {
-        state.history = state.history.push(Object.freeze(current));
-        state.future = Immutable.List();
-      }
+      [state.history, state.future] = Calc.addToHistory(state);
       const attacking = state.attacking;
       const defending = state.defending;
       return Object.assign(state, stateUpdate(defending, attacking));
@@ -82,20 +77,21 @@ export class Calc extends React.Component {
     }
   }
 
+  static overwriteLastInHistory(state) {
+      const current = {attacking: state.attacking, defending: state.defending};
+      const history = state.history;
+      return state.history.update(history.size - 1, () => current);
+  }
+
   propagateFeatureChange(features_type, input_name, parsed_value) {
     this.setState(state => {
       const creature_data = this.creature_data;
-      const features = state[features_type].set(input_name, parsed_value);
-      const current = {attacking: state.attacking, defending: state.defending};
-      const last = state.history.last();
       if (input_name === 'name' && creature_data && creature_data.hasCreature(parsed_value)) {
-        if (!featuresEqual(current, last)) {
-          state.history = state.history.push(Object.freeze(current));
-          state.future = Immutable.List();
-        }
+        [state.history, state.future] = Calc.addToHistory(state);
       } else {
-        state.history = state.history.update(state.history.size - 1, () => current);
+        state.history = Calc.overwriteLastInHistory(state);
       }
+      const features = state[features_type].set(input_name, parsed_value);
       return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
     });
   }
@@ -112,7 +108,7 @@ export class Calc extends React.Component {
       const number = guard.get('number')
       const features = Calc.getCurrentFeatures(state).merge(creature).set('amount', number);
       const features_type = state.toggle;
-      [state.history, state.future] = Calc.updateHistory(state);
+      [state.history, state.future] = Calc.addToHistory(state);
       return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
     })
   }
@@ -121,7 +117,7 @@ export class Calc extends React.Component {
     this.setState(state => {
       const features = Calc.getCurrentFeatures(state).merge(creature);
       const features_type = state.toggle;
-      [state.history, state.future] = Calc.updateHistory(state);
+      [state.history, state.future] = Calc.addToHistory(state);
       return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
     });
   }
@@ -200,7 +196,7 @@ export class Calc extends React.Component {
         <Interactions
             goBack={this.goBack}
             goForward={this.goForward}
-            handleSwap={this.handleSwap}
+            handleSwap={this.swapFeatureTypes}
         />
         <div className={style.attacking}>
           <Features type="attacking"
