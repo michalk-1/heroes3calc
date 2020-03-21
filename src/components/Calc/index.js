@@ -51,13 +51,19 @@ export class Calc extends React.Component {
   static addToHistory(state) {
       const current = {attacking: state.attacking, defending: state.defending};
       const last = state.history.last();
-      if (!featuresEqual(last, current)) {
+      if (featuresEqual(last, current)) {
+        return [state.history, state.future];
+      } else {
         const history = state.history.push(Object.freeze(current));
         const future = Immutable.List();
         return [history, future];
-      } else {
-        return [state.history, state.future];
       }
+  }
+
+  static overwriteLastInHistory(state) {
+      const current = {attacking: state.attacking, defending: state.defending};
+      const history = state.history;
+      return state.history.update(history.size - 1, () => current);
   }
 
   swapFeatureTypes() {
@@ -77,12 +83,6 @@ export class Calc extends React.Component {
     }
   }
 
-  static overwriteLastInHistory(state) {
-      const current = {attacking: state.attacking, defending: state.defending};
-      const history = state.history;
-      return state.history.update(history.size - 1, () => current);
-  }
-
   propagateFeatureChange(features_type, input_name, parsed_value) {
     this.setState(state => {
       const creature_data = this.creature_data;
@@ -97,9 +97,9 @@ export class Calc extends React.Component {
   }
 
   static getCurrentFeatures(state) {
-      const features_type = state.toggle;
-      const features = state[features_type];
-      return features;
+    const features_type = state.toggle;
+    const features = state[features_type];
+    return features;
   }
 
   propagateGuardFeatures(guard){
@@ -132,31 +132,31 @@ export class Calc extends React.Component {
       defending: state.defending
     };
 
-    return featuresEqual(current, previous.last()) ?
-        previous : previous.push(Object.freeze(current));
+    return featuresEqual(current, previous.last())
+      ? previous
+      : previous.push(Object.freeze(current));
   }
 
   static moveZipper(state, previous, next) {
-    if (next.size === 0)
-      return state;
-
-    return [Calc.saveCurrent(state, previous), next.last(), next.pop()];
+    if (next.size <= 0) {
+      return [previous, state, next];
+    } else {
+      return [Calc.saveCurrent(state, previous), next.last(), next.pop()];
+    }
   }
 
   goBack() {
     this.setState(state => {
-      let [previous, middle, next] = Calc.moveZipper(state, state.future, state.history);
-      state.history = next;
-      state.future = previous;
+      const [previous, middle, next] = Calc.moveZipper(state, state.future, state.history);
+      [state.future, state.history] = [previous, next];
       return Object.assign(state, middle);
     });
   }
 
   goForward() {
     this.setState(state => {
-      let [previous, middle, next] = Calc.moveZipper(state, state.history, state.future);
-      state.history = previous;
-      state.future = next;
+      const [previous, middle, next] = Calc.moveZipper(state, state.history, state.future);
+      [state.history, state.future] = [previous, next];
       return Object.assign(state, middle);
     });
   }
@@ -227,8 +227,6 @@ export class Calc extends React.Component {
           {' '}{defending_losses_average} {defending_name}s perish.<br/>
           The {defending_name}s do {defending_damage_average} damage.
           {' '}{attacking_losses_average} {attacking_name}s perish.<br/>
-          History: {state.history.size}<br/>
-          Future: {state.future.size}<br/>
         </div>
       </div>
     );

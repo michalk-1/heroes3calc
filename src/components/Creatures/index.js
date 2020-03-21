@@ -138,9 +138,7 @@ export class Creatures extends React.Component {
     const banks = props.banks;
     return (
       <div className={style.creatures}>
-        {banks.map((bank, i) =>
-          <CreatureBank bank={bank} onGuardClick={onGuardClick}/>
-        )}
+        {banks.map((bank, i) => <CreatureBank bank={bank} key={bank.get('name')} onGuardClick={onGuardClick}/>)}
       </div>
     );
   }
