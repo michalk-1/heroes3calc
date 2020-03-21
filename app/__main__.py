@@ -27,7 +27,9 @@ def five_stacks(name: str, number: int) -> Sequence[StackType]:
     return [one_stack(name, number // 5)] * 5
 
 
-def five_stacks_with_upgrade(name: str, upgrade_name: str, number: int) -> Sequence[StackType]:
+def five_stacks_with_upgrade(
+    name: str, upgrade_name: str, number: int
+) -> Sequence[StackType]:
     assert number % 5 == 0, number
     number_per_stack = number // 5
     return [
@@ -57,6 +59,7 @@ CREATURE_BANKS_0 = {
         {"guards": [gold_dragon(1)]},
         {"guards": [black_dragon(1)]},
     ],
+    "churchyard": [{"guards": 6 * [one_stack("Zombie", 15)]}],
     "crypt": [
         {
             "guards": [
@@ -78,6 +81,12 @@ CREATURE_BANKS_0 = {
         },
         {"guards": [skeleton(20), walking_dead(20), wight(10), vampire(5)]},
         {"guards": [skeleton(20), walking_dead(20), wight(10), vampire(10)]},
+    ],
+    "cyclops_stockpile": [
+        {"guards": five_stacks_with_upgrade("Cyclops", "Cyclops King", 20)},
+        {"guards": five_stacks_with_upgrade("Cyclops", "Cyclops King", 30)},
+        {"guards": five_stacks_with_upgrade("Cyclops", "Cyclops King", 40)},
+        {"guards": five_stacks_with_upgrade("Cyclops", "Cyclops King", 50)},
     ],
     "dragon_fly_hive": [
         {"guards": five_stacks("Dragon Fly", 30)},
@@ -115,7 +124,7 @@ CREATURE_BANKS_0 = {
         {"guards": five_stacks_with_upgrade("Imp", "Familiar", 200)},
         {"guards": five_stacks_with_upgrade("Imp", "Familiar", 300)},
     ],
-    "mansion": [  # TODO: remove?
+    "mansion": [
         {"guards": five_stacks("Vampire Lord", 40)},
         {"guards": five_stacks("Vampire Lord", 60)},
         {"guards": five_stacks("Vampire Lord", 80)},
