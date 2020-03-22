@@ -41,7 +41,7 @@ export function Dropdown(props) {
     <div>
       <Autocomplete
         value={props.value}
-        inputProps={{id: 'states-autocomplete', style: {boxSizing: 'border-box'}}}
+        inputProps={{id: 'states-autocomplete'}}
         wrapperStyle={{display: 'block'}}
         items={values}
         getItemValue={item => item.get('name')}

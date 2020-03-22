@@ -12,7 +12,6 @@ export function CalcInput({title, values, onChange}) {
       <input
         value={value}
         onChange={ev => onChange(name, ev.target.value)}
-        style={{boxSizing: 'border-box'}}
       />
     </div>
   );
@@ -45,7 +44,6 @@ export function ButtonInput({title, values, onChange}) {
           style={{
             display: 'inline-block',
             width: `${100 - button_width - gap_percent}%`,
-            boxSizing: 'border-box',
           }}
         />
         <div style={{
