@@ -1,8 +1,7 @@
-import Immutable from 'immutable';
 import React from 'react';
 import style from './Features.css';
-import { CalcInput, CalcDropdown } from '../CalcInput/index.js';
-import { TITLES } from './../../data.js';
+import { CalcInput, CreatureDropdown, ButtonInput } from '../CalcInput/index.js';
+import { FEATURE_TYPES, TITLES } from './../../data.js';
 import { parseType } from  './../../util.js';
 
 export class Features extends React.Component {
@@ -46,26 +45,32 @@ export class Features extends React.Component {
 
   render() {
     const props = this.props;
-    const values = props.values;
-    const state_style = this.props.active ? style.active : style.inactive;
-    const creature_data = props.creature_data;
-    const onInputChange = this.onInputChange;
     const onNameChange = this.onNameChange;
-    const data = Immutable.Map({creature_data: creature_data, values: values});
+    const values = props.values;
+    const creature_data = props.creature_data;
+    const dropdown_props = {creature_data: creature_data, values: values, onChange: onNameChange};
+    const onInputChange = this.onInputChange;
+    const input_props = {values: values, onChange: onInputChange};
+    const state_style = props.active ? style.active : style.inactive;
+    const is_attacking = props.type === FEATURE_TYPES.attacking;
     return (
       <div className={`${state_style} ${style.features}`} onClick={() => this.onClick()}>
-        <CalcDropdown title={TITLES.name} data={data} onChange={onNameChange}/>
-        <CalcInput title={TITLES.amount} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.health} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.speed} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.attack} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.defense} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.minimum_damage} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.maximum_damage} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.special} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.additional_attack} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.additional_defense} values={values} onChange={onInputChange}/>
-        <CalcInput title={TITLES.damage_reduction} values={values} onChange={onInputChange}/>
+        <CreatureDropdown title={TITLES.name} {...dropdown_props}/>
+        <CalcInput title={TITLES.speed} {...input_props}/>
+        <CalcInput title={TITLES.health} {...input_props}/>
+        {is_attacking
+         ? <ButtonInput title={TITLES.amount} {...input_props}/>
+         : <CalcInput title={TITLES.amount} {...input_props}/>}
+        {is_attacking
+         ? <ButtonInput title={TITLES.additional_attack} {...input_props}/>
+         : <CalcInput title={TITLES.additional_attack} {...input_props}/>}
+        <CalcInput title={TITLES.additional_defense} {...input_props}/>
+        <CalcInput title={TITLES.damage_reduction} {...input_props}/>
+        <CalcInput title={TITLES.attack} {...input_props}/>
+        <CalcInput title={TITLES.defense} {...input_props}/>
+        <CalcInput title={TITLES.minimum_damage} {...input_props}/>
+        <CalcInput title={TITLES.maximum_damage} {...input_props}/>
+        <CalcInput title={TITLES.special} {...input_props}/>
       </div>
     );
   }

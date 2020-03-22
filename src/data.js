@@ -156,6 +156,11 @@ export const STRING_NAMES = [
   'special',
 ];
 
+export const FEATURE_TYPES = {
+  attacking: 'attacking',
+  defending: 'defending',
+}
+
 export const NAMES = Object.assign(
   ...Object.entries(TITLES).map(([k, v]) => ({[v]: k}))
 );
