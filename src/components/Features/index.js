@@ -49,17 +49,16 @@ export class Features extends React.Component {
     const input_props = {values: values, onChange: onInputChange};
     const state_style = style.inactive;
     const is_attacking = features_type === FEATURE_TYPES.attacking;
+    const onButtonClick = props.onButtonClick;
     return (
       <div className={`${state_style} ${style.features}`}>
         <CreatureDropdown title={TITLES.name} {...dropdown_props}/>
         <CalcInput title={TITLES.speed} {...input_props}/>
         <CalcInput title={TITLES.health} {...input_props}/>
         {is_attacking
-         ? <ButtonInput title={TITLES.amount} {...input_props}/>
+         ? <ButtonInput title={TITLES.amount} onClick={onButtonClick} {...input_props}/>
          : <CalcInput title={TITLES.amount} {...input_props}/>}
-        {is_attacking
-         ? <ButtonInput title={TITLES.additional_attack} {...input_props}/>
-         : <CalcInput title={TITLES.additional_attack} {...input_props}/>}
+        <CalcInput title={TITLES.additional_attack} {...input_props}/>
         <CalcInput title={TITLES.additional_defense} {...input_props}/>
         <CalcInput title={TITLES.damage_reduction} {...input_props}/>
         <CalcInput title={TITLES.attack} {...input_props}/>

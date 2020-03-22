@@ -6,7 +6,8 @@ import {AttackResult} from '../AttackResult/index.js';
 import {Creatures, asyncGetBanks, asyncGetCreatureData} from '../Creatures/index.js';
 import {Features} from '../Features/index.js';
 import {RetaliationResult} from '../RetaliationResult/index.js';
-import {TITLES, FEATURE_TYPES} from '../../data.js';
+import {NAMES, TITLES, FEATURE_TYPES} from '../../data.js';
+import {calcMin, calcMax, calcAverage, calcTotalHealth} from "../../calc-lib.js";
 import {memoize} from "../../immutable-lib";
 
 const emptyForm = memoize(applib.emptyForm);
@@ -65,6 +66,32 @@ export class Calc extends React.Component {
       const current = {attacking: state.attacking, defending: state.defending};
       const history = state.history;
       return state.history.update(history.size - 1, () => current);
+  }
+
+  optimizeOneHitAttacking(field_name) {
+    const state = this.state;
+    const attacking = state.attacking;
+    const defending = state.defending;
+    if (field_name === NAMES[TITLES.amount]) {
+      const attacking_1 = attacking.set('damage', calcAverage(Immutable.Map({
+        minimum: calcMin(attacking, defending),
+        maximum: calcMax(attacking, defending),
+      })));
+      const defending_1 = calcTotalHealth(defending);
+      const number = attacking_1.get(field_name);
+      const damage = attacking_1.get('damage');
+      const damage_average = damage.get('average');
+      const total_health = defending_1.get('total_health');
+      const number_1 = Math.ceil(number * total_health / damage_average);
+      this.setState(state => {
+        const attacking = state.attacking.set(field_name, number_1);
+        return Object.assign(state, stateUpdate(attacking, state.defending));
+      });
+    } else if (field_name === NAMES[TITLES.additional_attack]) {
+      throw Error(`Unsupported field '${field_name}' yet.`);
+    } else {
+      throw Error(`Unsupported field '${field_name}'.`);
+    }
   }
 
   swapFeatureTypes() {
@@ -193,6 +220,7 @@ export class Calc extends React.Component {
             values={attacking}
             onInputChange={(...xs) => this.propagateFeatureChange(...xs)}
             onCreatureChange={(...xs) => this.propagateCreatureFeatures(...xs)}
+            onButtonClick={(...xs) => this.optimizeOneHitAttacking(...xs)}
           />
         </div>
         <div className={style.dummy}/>
@@ -203,6 +231,7 @@ export class Calc extends React.Component {
             values={defending}
             onCreatureChange={(...xs) => this.propagateCreatureFeatures(...xs)}
             onInputChange={(...xs) => this.propagateFeatureChange(...xs)}
+            onButtonClick={(...xs) => this.optimizeOneHitAttacking(...xs)}
           />
         </div>
         <div className={style.creatures}>

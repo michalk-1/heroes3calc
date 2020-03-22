@@ -29,7 +29,7 @@ export function CreatureDropdown({title, values, creature_data, onChange}) {
   );
 }
 
-export function ButtonInput({title, values, onChange}) {
+export function ButtonInput({title, values, onChange, onClick}) {
   const name = NAMES[title];
   const gap_percent = 1;
   const button_width = 10;
@@ -51,7 +51,9 @@ export function ButtonInput({title, values, onChange}) {
           width: `${button_width}%`,
           float: 'right',
         }} className={tooltip_style.tooltip}>
-          <button style={{textAlign: 'center', padding: 0}}>↺</button>
+          <button onClick={() => onClick(name)} style={{textAlign: 'center', padding: 0}}>
+            ↺
+          </button>
           <span className={tooltip_style.tooltiptext}>
             Find a value for which this creature wins with minimal losses.
           </span>

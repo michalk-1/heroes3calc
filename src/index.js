@@ -4,7 +4,8 @@ import { Calc } from './components/Calc/index.js';
 
 /*
 Todo:
-- Optimize additional attack and number to one-hit on average.
+- Optimize additional attack to one-hit on average.
+- Add one unit health left in the top prompt.
 - Disable editing in inputs that are pre-populated.
 - Rearrange the layout of top level components to more tight and aligned.
 */
