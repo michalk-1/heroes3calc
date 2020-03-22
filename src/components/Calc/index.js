@@ -1,13 +1,13 @@
-import React from 'react';
 import Immutable from 'immutable';
-import style from './Calc.css';
+import React from 'react';
 import applib from "../../app-lib";
-import {TITLES} from '../../data.js';
-import {memoize} from "../../immutable-lib";
+import style from './Calc.css';
 import {AttackResult} from '../AttackResult/index.js';
 import {Creatures, asyncGetBanks, asyncGetCreatureData} from '../Creatures/index.js';
 import {Features} from '../Features/index.js';
 import {RetaliationResult} from '../RetaliationResult/index.js';
+import {TITLES, FEATURE_TYPES} from '../../data.js';
+import {memoize} from "../../immutable-lib";
 
 const emptyForm = memoize(applib.emptyForm);
 const stateUpdate = memoize(applib.stateUpdate);
@@ -29,7 +29,6 @@ export class Calc extends React.Component {
     this.banks = Immutable.List();
     this.state = Object.assign(
       {
-        toggle: 'defending',
         history: Immutable.List(),
         future: Immutable.List(),
       },
@@ -98,34 +97,23 @@ export class Calc extends React.Component {
     });
   }
 
-  static getCurrentFeatures(state) {
-    const features_type = state.toggle;
-    const features = state[features_type];
-    return features;
-  }
-
   propagateGuardFeatures(guard){
     this.setState(state => {
       const creature = guard.get('creature');
       const number = guard.get('number')
-      const features = Calc.getCurrentFeatures(state).merge(creature).set('amount', number);
-      const features_type = state.toggle;
+      const features_type = FEATURE_TYPES.defending;
+      const features = state[features_type].merge(creature).set('amount', number);
       [state.history, state.future] = Calc.addToHistory(state);
       return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
     })
   }
 
-  propagateCreatureFeatures(creature) {
+  propagateCreatureFeatures(features_type, creature) {
     this.setState(state => {
-      const features = Calc.getCurrentFeatures(state).merge(creature);
-      const features_type = state.toggle;
+      const features = state[features_type].merge(creature);
       [state.history, state.future] = Calc.addToHistory(state);
       return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
     });
-  }
-
-  setActiveFeatures(type) {
-    this.setState({toggle: type});
   }
 
   static saveCurrent(state, previous) {
@@ -165,8 +153,6 @@ export class Calc extends React.Component {
 
   render() {
     const state = this.state;
-    const attacking_active = state.toggle === 'attacking';
-    const defending_active = state.toggle === 'defending';
     const attacking = state.attacking;
     const attacking_name = attacking.get('name');
     const attacking_damage_average = attacking.getIn(['damage', 'average']);
@@ -201,24 +187,22 @@ export class Calc extends React.Component {
             handleSwap={this.swapFeatureTypes}
         />
         <div className={style.attacking}>
-          <Features type="attacking"
-                    values={attacking}
-                    active={attacking_active}
-                    onInputChange={(...xs) => this.propagateFeatureChange(...xs)}
-                    onClick={type => this.setActiveFeatures(type)}
-                    onCreatureChange={creature => this.propagateCreatureFeatures(creature)}
-                    creature_data={creature_data}
+          <Features
+            creature_data={creature_data}
+            features_type={FEATURE_TYPES.attacking}
+            values={attacking}
+            onInputChange={(...xs) => this.propagateFeatureChange(...xs)}
+            onCreatureChange={(...xs) => this.propagateCreatureFeatures(...xs)}
           />
         </div>
         <div className={style.dummy}/>
         <div className={style.defending}>
-          <Features type="defending"
-                    values={defending}
-                    active={defending_active}
-                    onInputChange={(...xs) => this.propagateFeatureChange(...xs)}
-                    onClick={type => this.setActiveFeatures(type)}
-                    onCreatureChange={creature => this.propagateCreatureFeatures(creature)}
-                    creature_data={creature_data}
+          <Features
+            creature_data={creature_data}
+            features_type={FEATURE_TYPES.defending}
+            values={defending}
+            onCreatureChange={(...xs) => this.propagateCreatureFeatures(...xs)}
+            onInputChange={(...xs) => this.propagateFeatureChange(...xs)}
           />
         </div>
         <div className={style.creatures}>
