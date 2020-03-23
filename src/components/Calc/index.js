@@ -7,7 +7,7 @@ import {Creatures, asyncGetBanks, asyncGetCreatureData} from '../Creatures/index
 import {Features} from '../Features/index.js';
 import {RetaliationResult} from '../RetaliationResult/index.js';
 import {NAMES, TITLES, FEATURE_TYPES} from '../../data.js';
-import {calcMin, calcMax, calcAverage, calcTotalHealth} from "../../calc-lib.js";
+import {calcModifier, extractNumber, calcAverage, calcTotalHealth} from "../../calc-lib.js";
 import {memoize} from "../../immutable-lib";
 
 const emptyForm = memoize(applib.emptyForm);
@@ -68,27 +68,78 @@ export class Calc extends React.Component {
       return state.history.update(history.size - 1, () => current);
   }
 
+  static optimizeAttackingNumber(attacking_avg, defending_th) {
+    const a_attack = extractNumber(attacking_avg, 'attack');
+    const a_damage = extractNumber(attacking_avg.get('damage'), 'average');
+    const a_additional_attack = extractNumber(attacking_avg, 'additional_attack');
+    const d_additional_defense = extractNumber(defending_th, 'additional_defense');
+    const d_defense = extractNumber(defending_th, 'defense');
+    const d_reduction = 1 - extractNumber(defending_th, 'damage_reduction') / 100;
+    const d_total_health = extractNumber(defending_th, 'total_health');
+    const a_total_attack = a_attack + a_additional_attack;
+    const d_total_defense = d_defense + d_additional_defense;
+    const modifier = calcModifier(a_total_attack, d_total_defense);
+    const number = d_total_health / (modifier * a_damage * d_reduction);
+    const number_1 = Math.ceil(number);
+    const number_2 = Number.isNaN(number_1) ? 0 : number_1;
+    return number_2;
+  }
+
+  static optimizeAttackingAttack(attacking_avg, defending_th) {
+    const a_attack = extractNumber(attacking_avg, 'attack');
+    const a_damage = extractNumber(attacking_avg.get('damage'), 'average');
+    const a_number = extractNumber(attacking_avg, 'amount');
+    const d_additional_defense = extractNumber(defending_th, 'additional_defense');
+    const d_defense = extractNumber(defending_th, 'defense');
+    const d_reduction = 1 - extractNumber(defending_th, 'damage_reduction') / 100;
+    const d_total_health = extractNumber(defending_th, 'total_health');
+    const d_total_defense = d_defense + d_additional_defense;
+    const multiplier = 0.05;
+    const modifier_cap = 8.0;
+    let numerator;
+    numerator = d_total_health
+    numerator += a_damage * a_number * d_reduction * (d_total_defense * multiplier - 1);
+    const denominator = a_damage * a_number * d_reduction * multiplier;
+    const additional_attack = numerator / denominator - a_attack;
+    const additional_attack_1 = Math.ceil(additional_attack);
+    const additional_attack_2 = additional_attack_1 < 0 ? 0 : additional_attack_1;
+    const additional_attack_3 = Number.isNaN(additional_attack_2) ? 0 : additional_attack_2;
+    const total_attack = a_attack + additional_attack_2;
+    if (total_attack < d_total_defense) {
+      console.warn("Unhandled case. Total attack lower than total defense.");
+    }
+    if (1 + multiplier * (total_attack - d_total_defense) > modifier_cap) {
+      const total_attack_alt = (multiplier * d_total_defense + modifier_cap - 1) / multiplier;
+      const attack_a0 = total_attack_alt - a_attack;
+      const attack_a1 = Math.ceil(attack_a0);
+      const attack_a2 = Number.isNaN(attack_a1) ? 0 : attack_a1;
+      return attack_a2;
+    } else {
+      return additional_attack_2;
+    }
+  }
+
   optimizeOneHitAttacking(field_name) {
     const state = this.state;
     const attacking = state.attacking;
     const defending = state.defending;
+    const defending_th = calcTotalHealth(defending);
+    const attacking_avg = attacking.set('damage', calcAverage(Immutable.Map({
+      minimum: extractNumber(attacking, 'minimum_damage'),
+      maximum: extractNumber(attacking, 'maximum_damage'),
+    })));
     if (field_name === NAMES[TITLES.amount]) {
-      const attacking_1 = attacking.set('damage', calcAverage(Immutable.Map({
-        minimum: calcMin(attacking, defending),
-        maximum: calcMax(attacking, defending),
-      })));
-      const defending_1 = calcTotalHealth(defending);
-      const number = attacking_1.get(field_name);
-      const damage = attacking_1.get('damage');
-      const damage_average = damage.get('average');
-      const total_health = defending_1.get('total_health');
-      const number_1 = Math.ceil(number * total_health / damage_average);
+      const number_opt = Calc.optimizeAttackingNumber(attacking_avg, defending_th) ;
       this.setState(state => {
-        const attacking = state.attacking.set(field_name, number_1);
-        return Object.assign(state, stateUpdate(attacking, state.defending));
+        const attacking_opt = state.attacking.set('amount', number_opt);
+        return Object.assign(state, stateUpdate(attacking_opt, state.defending));
       });
     } else if (field_name === NAMES[TITLES.additional_attack]) {
-      throw Error(`Unsupported field '${field_name}' yet.`);
+      const additional_attack_opt = Calc.optimizeAttackingAttack(attacking_avg, defending_th);
+      this.setState(state => {
+        const attacking_opt = state.attacking.set('additional_attack', additional_attack_opt)
+        return Object.assign(state, stateUpdate(attacking_opt, state.defending))
+      })
     } else {
       throw Error(`Unsupported field '${field_name}'.`);
     }
@@ -127,7 +178,7 @@ export class Calc extends React.Component {
   propagateGuardFeatures(guard){
     this.setState(state => {
       const creature = guard.get('creature');
-      const number = guard.get('number')
+      const number = guard.get('number');
       const features_type = FEATURE_TYPES.defending;
       const features = state[features_type].merge(creature).set('amount', number);
       [state.history, state.future] = Calc.addToHistory(state);

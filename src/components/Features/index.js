@@ -58,7 +58,13 @@ export class Features extends React.Component {
         {is_attacking
          ? <ButtonInput title={TITLES.amount} onClick={onButtonClick} {...input_props}/>
          : <CalcInput title={TITLES.amount} {...input_props}/>}
-        <CalcInput title={TITLES.additional_attack} {...input_props}/>
+        {is_attacking
+         ? <ButtonInput
+             title={TITLES.additional_attack}
+             onClick={onButtonClick}
+             {...input_props}
+           />
+         : <CalcInput title={TITLES.additional_attack} {...input_props}/>}
         <CalcInput title={TITLES.additional_defense} {...input_props}/>
         <CalcInput title={TITLES.damage_reduction} {...input_props}/>
         <CalcInput title={TITLES.attack} {...input_props}/>

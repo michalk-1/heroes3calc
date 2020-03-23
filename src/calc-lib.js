@@ -1,6 +1,6 @@
 import {REGEX_NUMBER} from './util.js';
 
-function extractNumber(map, name) {
+export function extractNumber(map, name) {
   return verifyIsNumber(map.get(name), name);
 }
 
@@ -63,14 +63,18 @@ export function calcLosses(army, damage) {
   });
 }
 
-function modifier(attack, defense) {
+export function calcModifier(attack, defense) {
+  let result;
   if (attack > defense) {
-    return 0.05 * (attack - defense);
+    result = 1 + 0.05 * (attack - defense);
   } else if (attack < defense) {
-    return 0.025 * (attack - defense);
+    result = 1 + 0.025 * (attack - defense);
   } else {
-    return 0;
+    result = 1;
   }
+  result = result > 8.0 ? 8.0 : result;
+  result = result < 0.01 ? 0.01 : result;
+  return result;
 }
 
 export function calcMin(attacking, defending)
@@ -87,19 +91,17 @@ function calcDamage(attacking, defending, base_damage_name)
 {
   const attacking_additional_attack = extractNumber(attacking, 'additional_attack');
   const attacking_attack = extractNumber(attacking, 'attack');
-  const attacking_amount = extractNumber(attacking, 'amount');
+  const attacking_number = extractNumber(attacking, 'amount');
   const attacking_base_damage = extractNumber(attacking, base_damage_name);
   const defending_additional_defense = extractNumber(defending, 'additional_defense');
   const defending_defense = extractNumber(defending, 'defense');
   const defending_damage_reduction = extractNumber(defending, 'damage_reduction');
-
-  let mod = 1 + modifier(attacking_attack + attacking_additional_attack,
-                         defending_defense + defending_additional_defense);
-  mod = mod > 8.0 ? 8.0 : mod;
-  mod = mod < 0.01 ? 0.01 : mod;
-
-  let result = attacking_amount * attacking_base_damage;
-  result *= mod;
+  const total_attack = attacking_attack + attacking_additional_attack;
+  const total_defense = defending_defense + defending_additional_defense;
+  const modifier = calcModifier(total_attack, total_defense);
+  let result;
+  result = attacking_number * attacking_base_damage;
+  result *= modifier;
   result *= 1 - defending_damage_reduction / 100;
   return nanToZero(Math.round(result));
 }
