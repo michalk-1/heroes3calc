@@ -4,8 +4,8 @@ import { Calc } from './components/Calc/index.js';
 
 /*
 Todo:
-- Optimize additional attack to one-hit on average.
-- Add one unit health left in the top prompt.
+- Add one unit health left in the top prompt (Remaining: X (YY health)).
+- Clicking on bank adjusts the number of guards if the name did not change in a slot.
 - Disable editing in inputs that are pre-populated.
 - Rearrange the layout of top level components to more tight and aligned.
 */
