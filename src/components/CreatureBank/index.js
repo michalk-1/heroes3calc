@@ -10,7 +10,36 @@ export class CreatureBank extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {level_index: 0};
+    const guards = props.bank.getIn(['levels', 0, 'guards']);
+    const guard_index = guards.size > 3 ? 2 : 0;
+    this.state = {level_index: 0, guard_index: guard_index, prev_guard_index: guard_index};
+  }
+
+  toggleNextLevel(levels) {
+    this.setState((state, props) => {
+      const level_index = state.level_index;
+      const next_level_index = (level_index + 1) % levels.size;
+      const level = levels.get(next_level_index);
+      const guards = level.get('guards');
+      const guard_index = state.guard_index;
+      const prev_guard_index = state.prev_guard_index;
+      const next_guard = (
+        guard_index < guards.size
+        ? guards.get(guard_index)
+        : guards.get(prev_guard_index)
+      );
+        props.onGuardClick(next_guard);
+        return {level_index: next_level_index};
+    });
+  }
+
+  onGuardClick(guard, i) {
+    this.setState((state, props) => {
+      props.onGuardClick(guard);
+      const prev_candidate = state.guard_index;
+      const prev_guard_index = prev_candidate !== i ? prev_candidate : state.prev_guard_index;
+      return {guard_index: i, prev_guard_index: prev_guard_index};
+    });
   }
 
   render() {
@@ -29,13 +58,7 @@ export class CreatureBank extends React.Component {
     const guards = level.get('guards');
     return (
       <div className={style['creature-bank']}>
-        <Bank image={bank_image} name={bank_name} onClick={() => {
-          this.setState((state) => {
-            const level_index = state.level_index;
-            const next_level_index = (level_index + 1) % levels.size;
-            return {level_index: next_level_index};
-          });
-        }}/>
+        <Bank image={bank_image} name={bank_name} onClick={() => this.toggleNextLevel(levels)}/>
         <div className={style['guards-container']}>
         <div className={style.guards}>
           {guards.map((guard, i) => {
@@ -51,7 +74,7 @@ export class CreatureBank extends React.Component {
                 <div className={style.creature}>
                   <img src={creature_image}
                        alt={creature_name}
-                       onClick={() => onGuardClick(guard)}
+                       onClick={() => this.onGuardClick(guard, i)}
                   />
                 </div>
               </div>
