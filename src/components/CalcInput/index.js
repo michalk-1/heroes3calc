@@ -51,7 +51,11 @@ export function ButtonInput({title, values, onChange, onClick}) {
           width: `${button_width}%`,
           float: 'right',
         }} className={tooltip_style.tooltip}>
-          <button onClick={() => onClick(name)} style={{textAlign: 'center', padding: 0}}>
+          <button onClick={() => onClick(name)} style={{
+            textAlign: 'center',
+            padding: 0,
+            width: `${100}%`,
+          }}>
             ↺
           </button>
           <span className={tooltip_style.tooltiptext}>
