@@ -53,7 +53,6 @@ export class Features extends React.Component {
     return (
       <div className={`${state_style} ${style.features}`}>
         <CreatureDropdown title={TITLES.name} {...dropdown_props}/>
-        <CalcInput title={TITLES.speed} {...input_props}/>
         <CalcInput title={TITLES.health} {...input_props}/>
         {is_attacking
          ? <ButtonInput title={TITLES.amount} onClick={onButtonClick} {...input_props}/>
@@ -67,6 +66,7 @@ export class Features extends React.Component {
          : <CalcInput title={TITLES.additional_attack} {...input_props}/>}
         <CalcInput title={TITLES.additional_defense} {...input_props}/>
         <CalcInput title={TITLES.damage_reduction} {...input_props}/>
+        <CalcInput title={TITLES.speed} {...input_props}/>
         <CalcInput title={TITLES.attack} {...input_props}/>
         <CalcInput title={TITLES.defense} {...input_props}/>
         <CalcInput title={TITLES.minimum_damage} {...input_props}/>
