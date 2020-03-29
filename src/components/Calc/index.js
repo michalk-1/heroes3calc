@@ -85,6 +85,13 @@ export class Calc extends React.Component {
     return number_2;
   }
 
+  static sanitizeResult(additional_attack) {
+      const additional_attack_1 = Math.ceil(additional_attack);
+      const additional_attack_2 = additional_attack_1 < 0 ? 0 : additional_attack_1;
+      const additional_attack_3 = Number.isNaN(additional_attack_2) ? 0 : additional_attack_2;
+      return additional_attack_3;
+  }
+
   static optimizeAttackingAttack(attacking_avg, defending_th) {
     const a_attack = extractNumber(attacking_avg, 'attack');
     const a_damage = extractNumber(attacking_avg.get('damage'), 'average');
@@ -94,28 +101,32 @@ export class Calc extends React.Component {
     const d_reduction = 1 - extractNumber(defending_th, 'damage_reduction') / 100;
     const d_total_health = extractNumber(defending_th, 'total_health');
     const d_total_defense = d_defense + d_additional_defense;
-    const multiplier = 0.05;
-    const modifier_cap = 8.0;
-    let numerator;
-    numerator = d_total_health
-    numerator += a_damage * a_number * d_reduction * (d_total_defense * multiplier - 1);
-    const denominator = a_damage * a_number * d_reduction * multiplier;
-    const additional_attack = numerator / denominator - a_attack;
-    const additional_attack_1 = Math.ceil(additional_attack);
-    const additional_attack_2 = additional_attack_1 < 0 ? 0 : additional_attack_1;
-    const additional_attack_3 = Number.isNaN(additional_attack_2) ? 0 : additional_attack_2;
-    const total_attack = a_attack + additional_attack_2;
-    if (total_attack < d_total_defense) {
-      console.warn("Unhandled case. Total attack lower than total defense.");
+    const calcAdditionalAttack = (multiplier) => {
+      let a_attack_opt;
+      a_attack_opt = d_total_health
+      a_attack_opt += a_damage * a_number * d_reduction * (d_total_defense * multiplier - 1);
+      a_attack_opt /= a_damage * a_number * d_reduction * multiplier;
+      const additional_attack_1 = a_attack_opt - a_attack;
+      const additional_attack_2 = Calc.sanitizeResult(additional_attack_1);
+      const modifier = 1 + multiplier * (a_attack + additional_attack_2 - d_total_defense);
+      if (modifier < 0.01 || 8.0 < modifier) {
+        let total_attack_alt;
+        total_attack_alt = (multiplier * d_total_defense + modifier_cap - 1);
+        total_attack_alt /= multiplier;
+        return Calc.sanitizeResult(total_attack_alt - a_attack);
+      } else {
+        return additional_attack_2;
+      }
     }
-    if (1 + multiplier * (total_attack - d_total_defense) > modifier_cap) {
-      const total_attack_alt = (multiplier * d_total_defense + modifier_cap - 1) / multiplier;
-      const attack_a0 = total_attack_alt - a_attack;
-      const attack_a1 = Math.ceil(attack_a0);
-      const attack_a2 = Number.isNaN(attack_a1) ? 0 : attack_a1;
-      return attack_a2;
+    const a_multiplier = 0.05;
+    const a_modifier_cap = 8.0;
+    const additional_attack = calcAdditionalAttack(a_multiplier, a_modifier_cap);
+    if (additional_attack + a_attack < d_total_defense) {
+      const d_modifier_cap = 0.01;
+      const d_multiplier = 0.025;
+      return calcAdditionalAttack(d_multiplier, d_modifier_cap);
     } else {
-      return additional_attack_2;
+      return additional_attack;
     }
   }
 
