@@ -105,3 +105,58 @@ function calcDamage(attacking, defending, base_damage_name)
   result *= 1 - defending_damage_reduction / 100;
   return nanToZero(Math.round(result));
 }
+
+export function optimizeAttackingAttack(attacking_avg, defending_th) {
+  const a_attack = extractNumber(attacking_avg, 'attack');
+  const a_damage = extractNumber(attacking_avg.get('damage'), 'average');
+  const a_number = extractNumber(attacking_avg, 'amount');
+  const d_additional_defense = extractNumber(defending_th, 'additional_defense');
+  const d_defense = extractNumber(defending_th, 'defense');
+  const d_reduction = 1 - extractNumber(defending_th, 'damage_reduction') / 100;
+  const d_total_health = extractNumber(defending_th, 'total_health');
+  const d_total_defense = d_defense + d_additional_defense;
+  const calcAdditionalAttack = (multiplier) => {
+    let a_attack_opt;
+    a_attack_opt = d_total_health
+    a_attack_opt += a_damage * a_number * d_reduction * (d_total_defense * multiplier - 1);
+    a_attack_opt /= a_damage * a_number * d_reduction * multiplier;
+    const additional_attack_1 = a_attack_opt - a_attack;
+    const additional_attack_2 = Calc.sanitizeResult(additional_attack_1);
+    const modifier = 1 + multiplier * (a_attack + additional_attack_2 - d_total_defense);
+    if (modifier < 0.01 || 8.0 < modifier) {
+      let total_attack_alt;
+      total_attack_alt = (multiplier * d_total_defense + modifier_cap - 1);
+      total_attack_alt /= multiplier;
+      return Calc.sanitizeResult(total_attack_alt - a_attack);
+    } else {
+      return additional_attack_2;
+    }
+  }
+  const a_multiplier = 0.05;
+  const a_modifier_cap = 8.0;
+  const additional_attack = calcAdditionalAttack(a_multiplier, a_modifier_cap);
+  if (additional_attack + a_attack < d_total_defense) {
+    const d_modifier_cap = 0.01;
+    const d_multiplier = 0.025;
+    return calcAdditionalAttack(d_multiplier, d_modifier_cap);
+  } else {
+    return additional_attack;
+  }
+}
+
+export function optimizeAttackingNumber(attacking_avg, defending_th) {
+  const a_attack = extractNumber(attacking_avg, 'attack');
+  const a_damage = extractNumber(attacking_avg.get('damage'), 'average');
+  const a_additional_attack = extractNumber(attacking_avg, 'additional_attack');
+  const d_additional_defense = extractNumber(defending_th, 'additional_defense');
+  const d_defense = extractNumber(defending_th, 'defense');
+  const d_reduction = 1 - extractNumber(defending_th, 'damage_reduction') / 100;
+  const d_total_health = extractNumber(defending_th, 'total_health');
+  const a_total_attack = a_attack + a_additional_attack;
+  const d_total_defense = d_defense + d_additional_defense;
+  const modifier = calcModifier(a_total_attack, d_total_defense);
+  const number = d_total_health / (modifier * a_damage * d_reduction);
+  const number_1 = Math.ceil(number);
+  const number_2 = Number.isNaN(number_1) ? 0 : number_1;
+  return number_2;
+}
