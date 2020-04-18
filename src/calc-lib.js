@@ -106,6 +106,13 @@ function calcDamage(attacking, defending, base_damage_name)
   return nanToZero(Math.round(result));
 }
 
+function sanitizeResult(additional_attack) {
+  const additional_attack_1 = Math.ceil(additional_attack);
+  const additional_attack_2 = additional_attack_1 < 0 ? 0 : additional_attack_1;
+  const additional_attack_3 = Number.isNaN(additional_attack_2) ? 0 : additional_attack_2;
+  return additional_attack_3;
+}
+
 export function optimizeAttackingAttack(attacking_avg, defending_th) {
   const a_attack = extractNumber(attacking_avg, 'attack');
   const a_damage = extractNumber(attacking_avg.get('damage'), 'average');
@@ -121,13 +128,13 @@ export function optimizeAttackingAttack(attacking_avg, defending_th) {
     a_attack_opt += a_damage * a_number * d_reduction * (d_total_defense * multiplier - 1);
     a_attack_opt /= a_damage * a_number * d_reduction * multiplier;
     const additional_attack_1 = a_attack_opt - a_attack;
-    const additional_attack_2 = Calc.sanitizeResult(additional_attack_1);
+    const additional_attack_2 = sanitizeResult(additional_attack_1);
     const modifier = 1 + multiplier * (a_attack + additional_attack_2 - d_total_defense);
     if (modifier < 0.01 || 8.0 < modifier) {
       let total_attack_alt;
       total_attack_alt = (multiplier * d_total_defense + modifier_cap - 1);
       total_attack_alt /= multiplier;
-      return Calc.sanitizeResult(total_attack_alt - a_attack);
+      return sanitizeResult(total_attack_alt - a_attack);
     } else {
       return additional_attack_2;
     }

@@ -1,34 +1,24 @@
 import Immutable from 'immutable';
 import React from 'react';
-import applib from "../../app-lib";
 import style from './Calc.css';
 import {AttackResult} from '../AttackResult/index.js';
 import {Creatures, asyncGetBanks, asyncGetCreatureData} from '../Creatures/index.js';
 import {Features} from '../Features/index.js';
 import {RetaliationResult} from '../RetaliationResult/index.js';
-import {NAMES, TITLES, FEATURE_TYPES} from '../../data.js';
+import applib from "../../app-lib";
 import {
   calcAverage,
-  calcModifier,
   calcTotalHealth,
   extractNumber,
   optimizeAttackingAttack,
   optimizeAttackingNumber,
 } from "../../calc-lib.js";
+import {NAMES, TITLES, FEATURE_TYPES} from '../../data.js';
+import {addToHistory, moveZipper, overwriteLastInHistory} from '../../history-lib.js';
 import {memoize} from "../../immutable-lib";
 
 const emptyForm = memoize(applib.emptyForm);
 const stateUpdate = memoize(applib.stateUpdate);
-
-function featuresEqual(lhs, rhs) {
-  if (lhs === undefined && rhs === undefined)
-    return true;
-
-  if (lhs === undefined || rhs === undefined)
-    return false;
-
-  return Immutable.is(lhs.attacking, rhs.attacking) && Immutable.is(lhs.defending, rhs.defending);
-}
 
 export class Calc extends React.Component {
 
@@ -55,31 +45,6 @@ export class Calc extends React.Component {
       this.banks = banks;
       this.forceUpdate();
     })
-  }
-
-  static addToHistory(state) {
-      const current = {attacking: state.attacking, defending: state.defending};
-      const last = state.history.last();
-      if (featuresEqual(last, current)) {
-        return [state.history, state.future];
-      } else {
-        const history = state.history.push(Object.freeze(current));
-        const future = Immutable.List();
-        return [history, future];
-      }
-  }
-
-  static overwriteLastInHistory(state) {
-      const current = {attacking: state.attacking, defending: state.defending};
-      const history = state.history;
-      return state.history.update(history.size - 1, () => current);
-  }
-
-  static sanitizeResult(additional_attack) {
-      const additional_attack_1 = Math.ceil(additional_attack);
-      const additional_attack_2 = additional_attack_1 < 0 ? 0 : additional_attack_1;
-      const additional_attack_3 = Number.isNaN(additional_attack_2) ? 0 : additional_attack_2;
-      return additional_attack_3;
   }
 
   optimizeOneHitAttacking(field_name) {
@@ -110,7 +75,7 @@ export class Calc extends React.Component {
 
   swapFeatureTypes() {
     this.setState(state => {
-      [state.history, state.future] = Calc.addToHistory(state);
+      [state.history, state.future] = addToHistory(state);
       const attacking = state.attacking;
       const defending = state.defending;
       return Object.assign(state, stateUpdate(defending, attacking));
@@ -129,9 +94,9 @@ export class Calc extends React.Component {
     this.setState(state => {
       const creature_data = this.creature_data;
       if (input_name === 'name' && creature_data && creature_data.hasCreature(parsed_value)) {
-        [state.history, state.future] = Calc.addToHistory(state);
+        [state.history, state.future] = addToHistory(state);
       } else {
-        state.history = Calc.overwriteLastInHistory(state);
+        state.history = overwriteLastInHistory(state);
       }
       const features = state[features_type].set(input_name, parsed_value);
       return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
@@ -144,7 +109,7 @@ export class Calc extends React.Component {
       const number = guard.get('number');
       const features_type = FEATURE_TYPES.defending;
       const features = state[features_type].merge(creature).set('amount', number);
-      [state.history, state.future] = Calc.addToHistory(state);
+      [state.history, state.future] = addToHistory(state);
       return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
     })
   }
@@ -152,33 +117,14 @@ export class Calc extends React.Component {
   propagateCreatureFeatures(features_type, creature) {
     this.setState(state => {
       const features = state[features_type].merge(creature);
-      [state.history, state.future] = Calc.addToHistory(state);
+      [state.history, state.future] = addToHistory(state);
       return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
     });
   }
 
-  static saveCurrent(state, previous) {
-    const current = {
-      attacking: state.attacking,
-      defending: state.defending
-    };
-
-    return featuresEqual(current, previous.last())
-      ? previous
-      : previous.push(Object.freeze(current));
-  }
-
-  static moveZipper(state, previous, next) {
-    if (next.size <= 0) {
-      return [previous, state, next];
-    } else {
-      return [Calc.saveCurrent(state, previous), next.last(), next.pop()];
-    }
-  }
-
   goBack() {
     this.setState(state => {
-      const [previous, middle, next] = Calc.moveZipper(state, state.future, state.history);
+      const [previous, middle, next] = moveZipper(state, state.future, state.history);
       [state.future, state.history] = [previous, next];
       return Object.assign(state, middle);
     });
@@ -186,7 +132,7 @@ export class Calc extends React.Component {
 
   goForward() {
     this.setState(state => {
-      const [previous, middle, next] = Calc.moveZipper(state, state.history, state.future);
+      const [previous, middle, next] = moveZipper(state, state.history, state.future);
       [state.history, state.future] = [previous, next];
       return Object.assign(state, middle);
     });
