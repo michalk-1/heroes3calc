@@ -1,10 +1,10 @@
 import Immutable from 'immutable';
 import React from 'react';
 import style from './Calc.css';
-import {AttackResult} from '../AttackResult/index.js';
-import {Creatures, asyncGetBanks, asyncGetCreatureData} from '../Creatures/index.js';
-import {Features} from '../Features/index.js';
-import {RetaliationResult} from '../RetaliationResult/index.js';
+import {AttackResult} from '../AttackResult/index';
+import {Creatures, asyncGetBanks, asyncGetCreatureData} from '../Creatures/index';
+import {Features} from '../Features/index';
+import {RetaliationResult} from '../RetaliationResult/index';
 import applib from "../../app-lib";
 import {
   calcAverage,
@@ -12,15 +12,26 @@ import {
   extractNumber,
   optimizeAttackingAttack,
   optimizeAttackingNumber,
-} from "../../calc-lib.js";
-import {NAMES, TITLES, FEATURE_TYPES} from '../../data.js';
-import {addToHistory, moveZipper, overwriteLastInHistory} from '../../history-lib.js';
+} from "../../calc-lib";
+import {NAMES, TITLES, FEATURE_TYPES} from '../../data';
+import {addToHistory, moveZipper, overwriteLastInHistory} from '../../history-lib';
 import {memoize} from "../../immutable-lib";
 
 const emptyForm = memoize(applib.emptyForm);
 const stateUpdate = memoize(applib.stateUpdate);
 
-export class Calc extends React.Component {
+type CalcProps = {};
+type CalcState = {
+  attacking: any,
+  defending: any,
+  history: any,
+  future: any,
+};
+
+export class Calc extends React.Component<CalcProps, CalcState> {
+
+  banks: any
+  creature_data: any
 
   constructor(props) {
     super(props);
@@ -75,10 +86,9 @@ export class Calc extends React.Component {
 
   swapFeatureTypes() {
     this.setState(state => {
-      [state.history, state.future] = addToHistory(state);
-      const attacking = state.attacking;
-      const defending = state.defending;
-      return Object.assign(state, stateUpdate(defending, attacking));
+      const history_future = addToHistory(state);
+      const attacking_defending = stateUpdate(state.defending, state.attacking);
+      return Object.assign({}, history_future, attacking_defending);
     });
   }
 
@@ -93,13 +103,13 @@ export class Calc extends React.Component {
   propagateFeatureChange(features_type, input_name, parsed_value) {
     this.setState(state => {
       const creature_data = this.creature_data;
-      if (input_name === 'name' && creature_data && creature_data.hasCreature(parsed_value)) {
-        [state.history, state.future] = addToHistory(state);
-      } else {
-        state.history = overwriteLastInHistory(state);
-      }
+      const history_state = (
+        (input_name === 'name' && creature_data && creature_data.hasCreature(parsed_value))
+        ? addToHistory(state)
+        : {history: overwriteLastInHistory(state)}
+      );
       const features = state[features_type].set(input_name, parsed_value);
-      return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
+      return Object.assign(history_state, Calc.dispatchStateUpdate(state, features, features_type));
     });
   }
 
@@ -109,32 +119,30 @@ export class Calc extends React.Component {
       const number = guard.get('number');
       const features_type = FEATURE_TYPES.defending;
       const features = state[features_type].merge(creature).set('amount', number);
-      [state.history, state.future] = addToHistory(state);
-      return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
+      const history_future = addToHistory(state);
+      return Object.assign(history_future, Calc.dispatchStateUpdate(state, features, features_type));
     })
   }
 
   propagateCreatureFeatures(features_type, creature) {
     this.setState(state => {
       const features = state[features_type].merge(creature);
-      [state.history, state.future] = addToHistory(state);
-      return Object.assign(state, Calc.dispatchStateUpdate(state, features, features_type));
+      const history_future = addToHistory(state);
+      return Object.assign(history_future, Calc.dispatchStateUpdate(state, features, features_type));
     });
   }
 
   goBack() {
     this.setState(state => {
       const [previous, middle, next] = moveZipper(state, state.future, state.history);
-      [state.future, state.history] = [previous, next];
-      return Object.assign(state, middle);
+      return Object.assign({future: previous, history: next}, middle);
     });
   }
 
   goForward() {
     this.setState(state => {
       const [previous, middle, next] = moveZipper(state, state.history, state.future);
-      [state.history, state.future] = [previous, next];
-      return Object.assign(state, middle);
+      return Object.assign({history: previous, future: next}, middle);
     });
   }
 

@@ -1,4 +1,4 @@
-import {REGEX_NUMBER} from './util.js';
+import {REGEX_NUMBER} from './util';
 
 export function extractNumber(map, name) {
   return verifyIsNumber(map.get(name), name);
@@ -122,7 +122,7 @@ export function optimizeAttackingAttack(attacking_avg, defending_th) {
   const d_reduction = 1 - extractNumber(defending_th, 'damage_reduction') / 100;
   const d_total_health = extractNumber(defending_th, 'total_health');
   const d_total_defense = d_defense + d_additional_defense;
-  const calcAdditionalAttack = (multiplier) => {
+  const calcAdditionalAttack = (multiplier, modifier_cap) => {
     let a_attack_opt;
     a_attack_opt = d_total_health
     a_attack_opt += a_damage * a_number * d_reduction * (d_total_defense * multiplier - 1);

@@ -1,3 +1,5 @@
+import Immutable from 'immutable';
+
 function featuresEqual(lhs, rhs) {
   if (lhs === undefined && rhs === undefined)
     return true;
@@ -12,11 +14,11 @@ export function addToHistory(state) {
   const current = {attacking: state.attacking, defending: state.defending};
   const last = state.history.last();
   if (featuresEqual(last, current)) {
-    return [state.history, state.future];
+    return {history: state.history, future: state.future};
   } else {
     const history = state.history.push(Object.freeze(current));
     const future = Immutable.List();
-    return [history, future];
+    return {history: history, future: future};
   }
 }
 

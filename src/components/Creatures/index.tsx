@@ -1,7 +1,7 @@
 import React from 'react';
 import style from './Creatures.css';
-import { CreatureBank } from '../CreatureBank/index.js';
-import { TOWNS, SKELETON, SKELETON_WARRIOR } from '../../data.js';
+import { CreatureBank } from '../CreatureBank/index';
+import { TOWNS } from '../../data';
 import Immutable from 'immutable';
 
 const List = Immutable.List;
@@ -11,16 +11,7 @@ function listBanksUri() {
   return uri;
 }
 
-export function asyncGetBank(bank_name) {
-    const creature_data_promise = asyncGetCreatureData();
-    const banks_promise = asyncGetBanks(creature_data_promise.then(creature_data => creature_data.by_name));
-    return banks_promise.then(banks => {
-      const bank = banks.find(bank => bank.get('name') === bank_name);
-      return bank;
-    })
-}
-
-export function asyncGetBanks(creatures_by_name_promise) {
+export function asyncGetBanks(creatures_by_name_promise): Promise<any> {
   const banks_promise = fetch(listBanksUri())
     .then(raw_response => raw_response.json())
     .then(response => Immutable.fromJS(response['banks']),
@@ -49,12 +40,12 @@ export function asyncGetBanks(creatures_by_name_promise) {
   });
 }
 
-function listTownCreaturesUri(town) {
+function listTownCreaturesUri(town: string): string {
   const uri = window.location.origin + '/d/list_of_creatures?town=' + town;
   return uri;
 }
 
-export function asyncGetCreatureData() {
+export function asyncGetCreatureData(): Promise<any> {
     return Promise.all(TOWNS.map((town) => {
       const uri = listTownCreaturesUri(town);
       return fetch(uri)
@@ -62,8 +53,8 @@ export function asyncGetCreatureData() {
         .then(json_response => List([town, Immutable.fromJS(json_response['uri'])]),
               error => console.log(error))
     })).then(
-      (town_and_creatures_list) => {
-        town_and_creatures_list = List(town_and_creatures_list);
+      (town_and_creatures_array) => {
+        const town_and_creatures_list: Immutable.List<any> = List(town_and_creatures_array);
         const by_town = Immutable.Map(town_and_creatures_list);
         const by_name_items = town_and_creatures_list.flatMap((town_and_creatures) => {
           const creatures = town_and_creatures.get(1);
@@ -76,7 +67,11 @@ export function asyncGetCreatureData() {
     )
 }
 
-class CreatureData {
+export class CreatureData {
+
+  by_town: any
+  by_name: any
+
   constructor(creatures_data) {
     this.by_town = creatures_data.by_town;
     this.by_name = creatures_data.by_name;
@@ -84,7 +79,7 @@ class CreatureData {
 
   getCreature(record) {
     if (!record.hasOwnProperty('name')) {
-      return Map();
+      return Immutable.Map();
     }
 
     const name = record.name;
@@ -103,7 +98,7 @@ class CreatureData {
 
   getCreatureFromTown(town, name) {
     if (!this.hasTown(town)) {
-      return Map();
+      return Immutable.Map();
     }
 
     const result_opt = this.by_town.get(town).find(
@@ -130,16 +125,12 @@ class CreatureData {
   }
 }
 
-export class Creatures extends React.Component {
-
-  render() {
-    const props = this.props;
-    const onGuardClick = props.onGuardClick;
-    const banks = props.banks;
-    return (
-      <div className={style.creatures}>
-        {banks.map((bank, i) => <CreatureBank bank={bank} key={bank.get('name')} onGuardClick={onGuardClick}/>)}
-      </div>
-    );
-  }
+export function Creatures({banks, onGuardClick}) {
+  return (
+    <div className={style.creatures}>
+      {banks.map((bank, i) => (
+        <CreatureBank bank={bank} key={bank.get('name')} onGuardClick={onGuardClick}/>
+      ))}
+    </div>
+  );
 }

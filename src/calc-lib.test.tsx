@@ -1,6 +1,6 @@
-import {calcLosses, calcTotalHealth} from './calc-lib.js';
+import {calcLosses, calcTotalHealth} from './calc-lib';
 import Immutable from 'immutable';
-import {memoize} from './immutable-lib.js';
+import {memoize} from './immutable-lib';
 
 
 

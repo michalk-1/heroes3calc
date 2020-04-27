@@ -1,21 +1,34 @@
 import Immutable from 'immutable';
 import deepEqual from "deep-equal";
 
-export const gSimpleCaches = [];
+type Cache = {
+    create(): {
+        has(key: any): boolean;
+        get(key: any): any;
+        set(key: any, value: any): void;
+        delete(key: any): void;
+        keys(): IterableIterator<any>;
+    };
+    all: Map<any, any>;
+}
+
+export const gSimpleCaches: Cache[] = [];
 export const gCacheMisses = {};
 export const gCacheHits = {};
 export const gCacheLongHits = {};
 
-// Creates a function that memoizes the result of func. If resolver is provided, it determines the cache key for storing
-// the result based on the arguments provided to the memoized function. By default, the first argument provided to the
-// memoized function is used as the map cache key. The func is invoked with the this binding of the memoized function.
+// Creates a function that memoizes the result of func. If resolver is provided, it determines
+// the cache key for storing the result based on the arguments provided to the memoized function.
+// By default, the first argument provided to the memoized function is used as the map cache key.
+// The func is invoked with the this binding of the memoized function.
 //
-// Note: The cache is exposed as the cache property on the memoized function. Its creation may be customized by
-// replacing the cacheCreate argument with one whose instances implement the Map method interface of clear,
-// delete, get, has, and set. The cache instance is then available under .cache property of the memoized function.
+// Note: The cache is exposed as the cache property on the memoized function. Its creation may be
+// customized by replacing the cacheCreate argument with one whose instances implement the Map
+// method interface of clear, delete, get, has, and set. The cache instance is then available
+// under 'cache' property of the memoized function.
 
 function simpleCache() {
-  const cache = {
+  const cache: Cache = {
     create() {
       let store = new Map();  // this map is doing deep equal and Immutable structures maintain some counters
       return {
@@ -63,7 +76,7 @@ function findIdentityKey(keys, arg) {
   return undefined;
 }
 
-function unaryLookup(cache, fn, arg, name) {
+function unaryLookup(cache, fn, arg, name?) {
   if (cache.has(arg)) {
     const result = cache.get(arg);
     if (name !== undefined) {
@@ -93,7 +106,7 @@ function unaryLookup(cache, fn, arg, name) {
   }
 }
 
-export function memoize(fn, cacheCreate) {
+export function memoize(fn, cacheCreate?) {
   if (cacheCreate === undefined) {
     cacheCreate = simpleCache();
   }

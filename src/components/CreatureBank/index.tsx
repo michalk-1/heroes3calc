@@ -1,8 +1,20 @@
 import React from 'react';
 import style from './CreatureBank.css';
-import { Bank } from '../Bank/index.js';
+import { Bank } from '../Bank/index';
 
-export class CreatureBank extends React.Component {
+type CreatureBankProps = {
+  onGuardClick: (guard: any) => void,
+  bank: any,
+};
+
+type CreatureBankState = {
+  level_index: number,
+  guard_index: number,
+  prev_guard_index: number,
+
+};
+
+export class CreatureBank extends React.Component<CreatureBankProps, CreatureBankState> {
   // bank: image, name, levels, onGuardClick
   // level: guard
   // guard: creature, number
@@ -33,7 +45,7 @@ export class CreatureBank extends React.Component {
     });
   }
 
-  onGuardClick(guard, i) {
+  onGuardClick(guard, i: number) {
     this.setState((state, props) => {
       props.onGuardClick(guard);
       const prev_candidate = state.guard_index;
@@ -46,7 +58,6 @@ export class CreatureBank extends React.Component {
     const state = this.state
     const level_index = state.level_index;
     const props = this.props;
-    const onGuardClick = props.onGuardClick;
     const bank = props.bank;
     if (bank === undefined) {
       return <div className={style.guards} />

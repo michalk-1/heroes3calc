@@ -1,6 +1,6 @@
 import React from 'react';
-import { Dropdown } from '../Dropdown/index.js';
-import { NAMES } from './../../data.js';
+import { Dropdown } from '../Dropdown/index';
+import { NAMES } from './../../data';
 import tooltip_style from './Tooltip.css';
 
 export function CalcInput({title, values, onChange}) {

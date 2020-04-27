@@ -1,10 +1,20 @@
 import React from 'react';
 import style from './Features.css';
-import { CalcInput, CreatureDropdown, ButtonInput } from '../CalcInput/index.js';
-import { FEATURE_TYPES, TITLES } from './../../data.js';
-import { parseType } from  './../../util.js';
+import { CalcInput, CreatureDropdown, ButtonInput } from '../CalcInput/index';
+import { FEATURE_TYPES, TITLES } from './../../data';
+import { parseType } from  './../../util';
 
-export class Features extends React.Component {
+type FeaturesProps = {
+  creature_data: any,
+  features_type: any,
+  values: any,
+  onInputChange: (features_type: string, name: string, parsed_value: any) => void,
+  onButtonClick: (field_name: string) => void,
+  onCreatureChange: (features_type: string, creature: any) => void,
+};
+
+export class Features extends React.Component<FeaturesProps, {}> {
+
   constructor(props) {
     super(props);
     this.state = {};
@@ -14,7 +24,6 @@ export class Features extends React.Component {
 
   onInputChange(name, value) {
     const props = this.props;
-    const creature_data = props.creature_data;
     const features_type = props.features_type;
     const previous_value = this.state[name];
     const parsed_value = parseType(name, value, previous_value);

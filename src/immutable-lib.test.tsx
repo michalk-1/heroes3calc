@@ -1,4 +1,4 @@
-import {memoize, isImmutable} from './immutable-lib.js';
+import {memoize, isImmutable} from './immutable-lib';
 import Immutable from 'immutable';
 import deepEqual from 'deep-equal';
 
@@ -56,7 +56,7 @@ describe('Immutable', () => {
     expect(fnMemoized()).toBe(obj);
   });
   it('can cache multi argument function call', () => {
-    const fn = (a, b) => ({'a': a, 'b': b});
+    const fn = (a?, b?) => ({'a': a, 'b': b});
     const fnMemoized = memoize(fn);
     const obj0 = fnMemoized();
     const obj1 = fnMemoized('a');

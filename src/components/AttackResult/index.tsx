@@ -8,12 +8,13 @@ export function formatResult(features, name) {
   const maximum_prop = prop.get('maximum');
   return minimum_prop === maximum_prop ?
     <span>{minimum_prop}</span> : (
-    <span>{minimum_prop}{' '}-{' '}{maximum_prop}{' '}(avg {average_prop})</span>
+    <span>
+      {minimum_prop}{' '}-{' '}{maximum_prop}{' '}(avg {average_prop})
+    </span>
   );
 }
 
-export function AttackResult(props) {
-  const attacking = props.attacking;
+export function AttackResult({attacking}) {
   return (
     <div className={style['attack-result']}>
       <p>Damage:{' '}{formatResult(attacking, 'damage')}</p>

@@ -34,21 +34,20 @@ function renderItem(item, isHighlighted) {
   );
 }
 
-export function Dropdown(props) {
-  const creature_data = props.creature_data;
+export function Dropdown({creature_data, value, onChange}) {
   const values = creature_data ? Array.from(creature_data.by_name.values()) : [];
   return (
     <div>
       <Autocomplete
-        value={props.value}
+        value={value}
         inputProps={{id: 'states-autocomplete'}}
         wrapperStyle={{display: 'block'}}
         items={values}
         getItemValue={item => item.get('name')}
         shouldItemRender={matchStateToTerm}
         sortItems={sortStates}
-        onChange={(ev, value) => props.onChange(value)}
-        onSelect={value => props.onChange(value)}
+        onChange={(ev, value) => onChange(value)}
+        onSelect={value => onChange(value)}
         renderMenu={children => (
           <div className="menu">
             {children}
