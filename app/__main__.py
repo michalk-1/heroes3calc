@@ -51,7 +51,6 @@ gold_dragon = partial(one_stack, "Gold Dragon")
 black_dragon = partial(one_stack, "Black Dragon")
 
 
-# TODO: expand the levels list to royal griffins etc
 CREATURE_BANKS_0 = {
     "black_tower": [  # levels
         {"guards": [green_dragon(1)]},
