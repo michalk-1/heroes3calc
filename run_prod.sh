@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source $HOME/.virtualenvs/h3calc/bin/activate
+source .venv/bin/activate
 
 # Exit on error. Append "|| true" if you expect an error.
 set -o errexit
