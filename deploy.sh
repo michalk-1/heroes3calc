@@ -35,4 +35,5 @@ rm run_devel.sh
 rm webpack.config.js
 git add --all
 git commit -m "Heroku."
-git push heroku heroku:master --force
+# git push heroku heroku:master --force
+git push origin heroku --force
