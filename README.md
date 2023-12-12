@@ -30,3 +30,10 @@ or
 ```
 ./run_prod.sh
 ```
+
+## Docker
+
+```commandline
+docker build -t heroes3calc
+docker run -p 8000:8000 heroes3calc
+```
