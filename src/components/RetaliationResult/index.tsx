@@ -6,7 +6,7 @@ export function RetaliationResult({defending}) {
   return (
     <div className={style['retaliation-result']}>
       <p>Losses:{' '}{formatResult(defending, 'losses')}</p>
-      <p>Damage:{' '}{formatResult(defending, 'damage')}</p>
+      <p>Retaliation Damage:{' '}{formatResult(defending, 'damage')}</p>
       <p>Remaining:{' '}{formatResult(defending, 'remaining')}</p>
     </div>
   );

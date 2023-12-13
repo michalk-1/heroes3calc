@@ -1,5 +1,6 @@
-# docker build -t heroes3calc
-# docker run -p 8000:8000 heroes3calc
+# docker build -t heroes3calc .
+# docker run -p 8080:80 heroes3calc
+# sensible-browser http://localhost:8080
 FROM node:16.9 as build1
 
 WORKDIR /heroes3calc
@@ -21,5 +22,5 @@ COPY LICENSE.txt /app/a/
 COPY run_prod.sh .
 ENV FLASK_APP=app
 ENV FLASK_ENV=production
-EXPOSE 8000
-CMD ["gunicorn", "--workers", "8", "--bind", "0.0.0.0:8000", "app"]
+EXPOSE 80
+CMD ["gunicorn", "--workers", "8", "--bind", "0.0.0.0:80", "app"]

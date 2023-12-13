@@ -28,6 +28,25 @@ type CalcState = {
   future: any,
 };
 
+const inflection = (verb: string, amount: number) : string => {
+  if (verb.length === 0) return '';
+  if (amount !== 1) return verb;
+  const last = verb[verb.length - 1];
+  if (last === 'o' || last === 'h')
+      return verb + 'es';
+
+  return verb + 's';
+}
+
+const plural = (name: string, amount: number) : string => {
+  if (name.length === 0) return '';
+  if (amount === 1) return name;
+  if (name[name.length - 1] === 's')
+      return name + 'es';
+
+  return name + 's';
+}
+
 export class Calc extends React.Component<CalcProps, CalcState> {
 
   banks: any
@@ -149,13 +168,17 @@ export class Calc extends React.Component<CalcProps, CalcState> {
   render() {
     const state = this.state;
     const attacking = state.attacking;
-    const attacking_name = attacking.get('name');
-    const attacking_damage_average = attacking.getIn(['damage', 'average']);
-    const attacking_losses_average = attacking.getIn(['losses', 'average']);
     const defending = state.defending;
-    const defending_name = defending.get('name');
-    const defending_damage_average = defending.getIn(['damage', 'average']);
-    const defending_losses_average = defending.getIn(['losses', 'average']);
+    const attacking_amount = attacking.get('amount');
+    const attacking_damage = attacking.getIn(['damage', 'minimum']);
+    const defending_losses = defending.getIn(['losses', 'minimum']);
+    const defending_remaining = defending.getIn(['remaining', 'maximum']);
+    const defending_damage = defending.getIn(['damage', 'maximum']);
+    const attacking_losses = attacking.getIn(['losses', 'maximum']);
+    const attacking_name_a = plural(attacking.get('name'), attacking_amount);
+    const defending_name_l = plural(defending.get('name'), defending_losses);
+    const defending_name_r = plural(defending.get('name'), defending_remaining);
+    const attacking_name_l = plural(attacking.get('name'), attacking_losses);
     const banks = this.banks;
     const creature_data = this.creature_data;
     return (
@@ -206,10 +229,16 @@ export class Calc extends React.Component<CalcProps, CalcState> {
           <Creatures banks={banks} onGuardClick={guard => this.propagateGuardFeatures(guard)}/>
         </div>
         <div className={style['fight-logs']}>
-          The {attacking_name}s do {attacking_damage_average} damage.
-          {' '}{defending_losses_average} {defending_name}s perish.<br/>
-          The {defending_name}s do {defending_damage_average} damage.
-          {' '}{attacking_losses_average} {attacking_name}s perish.<br/>
+          The {attacking_amount} {attacking_name_a}
+          {' '}{inflection('do', attacking_amount)} {attacking_damage} damage.
+
+          {' '}{defending_losses} {defending_name_l} {inflection('perish', defending_losses)}.<br/>
+
+          The remaining {defending_remaining} {defending_name_r}
+          {' '}{inflection('do', defending_remaining)} {defending_damage} damage.
+
+          {' '}{attacking_losses} {attacking_name_l}
+          {' '}{inflection('perish', attacking_losses)}.<br/>
         </div>
       </div>
     );
