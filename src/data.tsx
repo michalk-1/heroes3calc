@@ -1,15 +1,16 @@
 export const TOWNS = [
   'Castle',
-  'Rampart',
-  'Tower',
-  'Inferno',
-  'Necropolis',
-  'Dungeon',
-  'Stronghold',
-  'Fortress',
   'Conflux',
   'Cove',
+  'Dungeon',
+  'Factory',
+  'Fortress',
+  'Inferno',
+  'Necropolis',
   'Neutral',
+  'Rampart',
+  'Stronghold',
+  'Tower',
 ];
 
 export const HEROES = {
